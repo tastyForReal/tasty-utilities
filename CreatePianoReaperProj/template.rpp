@@ -17,7 +17,7 @@
       NAME RH
       SEL 1
       <SOURCE MIDI
-        HASDATA 1 960 QN
+        HASDATA 1 480
         CHASE_CC_TAKEOFFS 1
         E 460800 b0 7b 00
       >
@@ -31,7 +31,7 @@
       LOOP 0
       NAME LH
       <SOURCE MIDI
-        HASDATA 1 960 QN
+        HASDATA 1 480
         CHASE_CC_TAKEOFFS 1
         E 460800 b0 7b 00
       >
@@ -45,7 +45,7 @@
       LOOP 0
       NAME PEDAL
       <SOURCE MIDI
-        HASDATA 1 960 QN
+        HASDATA 1 480
         CHASE_CC_TAKEOFFS 1
         E 460800 b0 7b 00
       >
