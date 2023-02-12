@@ -19,7 +19,7 @@
       <SOURCE MIDI
         HASDATA 1 480
         CHASE_CC_TAKEOFFS 1
-        E 460800 b0 7b 00
+        E 230400 b0 7b 00
       >
     >
   >
@@ -33,7 +33,7 @@
       <SOURCE MIDI
         HASDATA 1 480
         CHASE_CC_TAKEOFFS 1
-        E 460800 b0 7b 00
+        E 230400 b0 7b 00
       >
     >
   >
@@ -47,7 +47,7 @@
       <SOURCE MIDI
         HASDATA 1 480
         CHASE_CC_TAKEOFFS 1
-        E 460800 b0 7b 00
+        E 230400 b0 7b 00
       >
     >
   >
