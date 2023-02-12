@@ -1,6 +1,6 @@
 <REAPER_PROJECT
   MASTERTRACKVIEW 1 1 0.5 0.5 -1 -1 -1
-  ZOOM 6.4 0 0
+  ZOOM 6.4
   <TEMPOENVEX
     PT 0 120 1
   >
@@ -8,8 +8,8 @@
     NAME RH
     REC 1 5088 1 7
     SEL 1
-    AUXRECV 1 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
-    AUXRECV 2 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
+    AUXRECV 1
+    AUXRECV 2
     <ITEM
       POSITION 0
       LENGTH 240
