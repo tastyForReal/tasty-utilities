@@ -6,7 +6,7 @@
   >
   <TRACK
     NAME RH
-    REC 1 5088 1 7 0 0 0 0
+    REC 1 5088 1 7
     SEL 1
     AUXRECV 1 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
     AUXRECV 2 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
