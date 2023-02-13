@@ -9,14 +9,21 @@ if (!([Environment]::OSVersion.Platform -eq 'Win32NT')) {
 	Exit 1
 }
 
-function CommandExists {
-	param($Command)
+function Test-CommandExistence {
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+		[string]$Command
+	)
 
-	if (Get-Command $Command -ErrorAction SilentlyContinue) {
+	# Try to retrieve the command
+	try {
+		Get-Command $Command -ErrorAction Stop
 		return $true
 	}
-
-	return $false
+ catch {
+		return $false
+	}
 }
 
 $stopwatch = New-Object Diagnostics.Stopwatch
@@ -25,24 +32,24 @@ $stopwatch.Start()
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # Install Chocolatey and the packages
-if (!(CommandExists choco)) {
+if (!(Test-CommandExistence 'choco')) {
 	Write-Host 'Installing Chocolatey...'
 	Set-ExecutionPolicy Bypass -Scope Process -Force
 	Invoke-Expression ((New-Object Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-	if (!(CommandExists python)) {
+	if (!(Test-CommandExistence 'python')) {
 		Write-Host 'Installing Python...'
 		choco upgrade -y python
 		refreshenv
 	}
 
-	if (!(CommandExists ffmpeg)) {
+	if (!(Test-CommandExistence 'ffmpeg')) {
 		Write-Host 'Installing ffmpeg...'
 		choco upgrade -y ffmpeg
 		refreshenv
 	}
 
-	if (!(CommandExists spotdl)) {
+	if (!(Test-CommandExistence 'spotdl')) {
 		Write-Host 'Installing spotdl...'
 		python -m pip install spotdl
 		refreshenv
