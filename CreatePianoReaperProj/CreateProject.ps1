@@ -104,7 +104,8 @@ $reaperInstallPath = (Get-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\C
 
 if ($openAfterSuccess) {
 	if (![string]::IsNullOrEmpty($reaperInstallPath)) {
-		Start-Process "$reaperInstallPath\reaper.exe" -ArgumentList [IO.Path]::Combine($pwd, $artist, $title, "$artist - $title.rpp")
+		$rppFile = [IO.Path]::Combine($pwd, $artist, $title, "$artist - $title.rpp")
+		Start-Process "$reaperInstallPath\reaper.exe" -ArgumentList "`"$rppFile`"" -Verbose
 		Exit 0
 	}
 
