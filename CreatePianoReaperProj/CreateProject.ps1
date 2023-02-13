@@ -1,108 +1,113 @@
 [CmdletBinding()]
 param (
-	[Parameter(Mandatory = $true)][string]$Search,
-	[Parameter(Mandatory = $false)][bool]$Open
+	[Parameter(Mandatory = $true)][string]$song,
+	[Parameter(Mandatory = $false)][bool]$openAfterSuccess
 )
 
-if (!($Env:OS -eq 'Windows_NT')) {
-	Write-Error 'You must be running on Windows to do this!'
-	Exit 1
+if (!($env:OS -eq 'Windows_NT')) {
+	Write-Host 'This script can only be run on Windows operating systems.'
+	break
 }
 
 function Test-CommandExistence {
-	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-		[string]$Command
+		[string]$CommandName
 	)
 
-	# Try to retrieve the command
-	try {
-		Get-Command $Command -ErrorAction Stop
+	$result = Get-Command $CommandName
+	if ($result) {
 		return $true
 	}
-	catch {
+	else {
 		return $false
 	}
 }
 
-$stopwatch = New-Object Diagnostics.Stopwatch
-$stopwatch.Start()
+$stopwatch = [Diagnostics.Stopwatch]::StartNew()
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# Install Chocolatey and the packages
+# Check if Chocolatey is already installed
 if (!(Test-CommandExistence 'choco')) {
-	Write-Host 'Installing Chocolatey...'
+	# Install Chocolatey
 	Set-ExecutionPolicy Bypass -Scope Process -Force
-	Invoke-Expression ((New-Object Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-	if (!(Test-CommandExistence 'python')) {
-		Write-Host 'Installing Python...'
-		choco upgrade -y python
-		refreshenv
-	}
-
-	if (!(Test-CommandExistence 'ffmpeg')) {
-		Write-Host 'Installing ffmpeg...'
-		choco upgrade -y ffmpeg
-		refreshenv
-	}
-
-	if (!(Test-CommandExistence 'spotdl')) {
-		Write-Host 'Installing spotdl...'
-		python -m pip install spotdl
-		refreshenv
-	}
+	Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
-Start-Process -FilePath 'python' -ArgumentList "-m spotdl `"$Search`"" -NoNewWindow -Wait
+# Check if FFmpeg is already installed
+if (!(Test-CommandExistence 'ffmpeg')) {
+	# Install FFmpeg
+	choco install ffmpeg
+}
 
-$songFile = (Get-ChildItem -Path $pwd -Filter *.mp3)[0].FullName
-$songFileName = [IO.Path]::GetFileNameWithoutExtension($songFile)
-$songArtist = ($songFileName -split ' - ')[0]
-$songTitle = ($songFileName -split ' - ')[1]
-$songDir = [IO.Path]::Combine($pwd, $songArtist, $songTItle)
-$songInfo = ffprobe "$songFile" -v quiet -print_format json -show_entries format=duration | ConvertFrom-Json
-$songLength = [Convert]::ToDouble($songInfo.format.duration)
+# Check if Python is already installed
+if (!(Test-CommandExistence 'python')) {
+	# Install Python
+	choco install python
+}
+
+# Refresh the environment to pick up the newly installed packages
+refreshenv
+
+# Check if the "spotdl" pip package is already installed
+if (!(python -c 'import spotdl; print(spotdl.__version__)' -eq $null)) {
+	# Install the "spotdl" pip package
+	pip install spotdl
+}
+
+$song = "`"$song`""
+
+Start-Process -FilePath 'python' -ArgumentList "-m spotdl $song" -NoNewWindow -Wait
+
+$mp3FilePath = Get-ChildItem -Path . -Filter *.mp3 | Select-Object -First 1 -ExpandProperty FullName
+
+$fileName = [IO.Path]::GetFileNameWithoutExtension($mp3FilePath)
+$artist, $title = $fileName -split ' - '
+
+$ffprobeOutput = & 'ffprobe.exe' '-i' $mp3FilePath '-show_entries' 'format=duration' '-v' 'quiet' '-of' 'csv=p=0'
+$duration = [double]$ffprobeOutput
 
 $ticksPerQuarterNote = 960.0
-$durationInTicks = $songLength * $ticksPerQuarterNote
+$ticks = $ticksPerQuarterNote * $duration
 
-$rppLink = 'https://raw.githubusercontent.com/tastyFr/tasty-utilities/master/CreatePianoReaperProj/template.rpp'
-$rpp = (New-Object Net.WebClient).DownloadString($rppLink)
-$rpp = $rpp.Replace('LENGTH 240', "LENGTH $songLength")
-$rpp = $rpp.Replace('E 230400', "E $durationInTicks")
-$rpp = $rpp.Replace('FILE ""', "FILE `"$songFileName.mp3`"")
-$rppFile = [IO.Path]::Combine($songDir, "$songFileName.rpp")
+# Download the .RPP template file and store it as a string
+$uri = 'https://raw.githubusercontent.com/tastyFr/tasty-utilities/master/CreatePianoReaperProj/template.rpp'
+$templateFile = Invoke-WebRequest $uri	-UseBasicParsing
+$templateString = $templateFile.Content
 
-New-Item  -Path		   $songDir	 -ItemType	  Directory -Force
-Move-Item -LiteralPath $songFile -Destination $songDir	-Force
-New-Item  -Path		   $rppFile	 -ItemType	  File		-Force -Value $rpp
+# Rename the file
+$newFileName = "$artist - $title.rpp"
 
-if ($Open) {
-	$reaperPath = [IO.Path]::Combine('HKLM:', 'SOFTWARE', 'Microsoft', 'Windows', 'CurrentVersion', 'Uninstall', 'REAPER')
-	if (!(Test-Path $reaperPath)) {
-		Write-Error 'REAPER is not installed.'
-		$stopwatch.Stop()
-		Exit 1
-	}
+# Replace contents in the file
+$templateString = $templateString.Replace('LENGTH 240', "LENGTH $duration")
+$templateString = $templateString.Replace('E 230400', "E $ticks")
+$templateString = $templateString.Replace('FILE ""', 'FILE "' + [IO.Path]::GetFileName($mp3FilePath) + '"')
 
-	$reaperAppPath = Resolve-Path (Get-ItemProperty $reaperPath).InstallLocation
-	if ([string]::IsNullOrEmpty($reaperAppPath)) {
-		Write-Error 'Unable to retrieve REAPER app path.'
-		$stopwatch.Stop()
-		Exit 1
-	}
+# Save the current file to the current directory
+Set-Content -Path $newFileName -Value $templateString
 
-	& ([IO.Path]::Combine($reaperAppPath, 'reaper.exe')) $rppFile
-}
+# Create a folder named after the song artist
+New-Item -ItemType Directory -Path $artist -Force
+
+# Create a folder inside the song artist folder, named after the song title
+New-Item -ItemType Directory -Path "$artist/$title" -Force
+
+# Put both the downloaded .MP3 and .RPP files into the song title folder
+Move-Item $mp3FilePath "$artist/$title" -Force
+Move-Item $newFileName "$artist/$title" -Force
 
 $stopwatch.Stop()
-$time = $stopwatch.ElapsedMilliseconds
-
 Write-Host ''
-Write-Host "Successfully created in $($time)ms"
-Write-Host ''
+Write-Host "Time elapsed: $($stopwatch.Elapsed.TotalSeconds) seconds"
 
-Exit 0
+$reaperInstallPath = (Get-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\REAPER').InstallLocation
+
+if ($openAfterSuccess) {
+	if (![string]::IsNullOrEmpty($reaperInstallPath)) {
+		Start-Process "$reaperInstallPath\reaper.exe" -ArgumentList [IO.Path]::Combine($pwd, $artist, $title, "$artist - $title.rpp")
+	}
+	else {
+		Write-Host 'REAPER is not installed. Aborting.'
+	}
+}
