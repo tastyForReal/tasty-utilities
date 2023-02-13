@@ -15,13 +15,12 @@ function Test-CommandExistence {
 		[string]$CommandName
 	)
 
-	$result = Get-Command $CommandName
+	$result = Get-Command $CommandName -ErrorAction SilentlyContinue
 	if ($result) {
 		return $true
 	}
-	else {
-		return $false
-	}
+
+	return $false
 }
 
 $stopwatch = [Diagnostics.Stopwatch]::StartNew()
@@ -107,7 +106,6 @@ if ($openAfterSuccess) {
 	if (![string]::IsNullOrEmpty($reaperInstallPath)) {
 		Start-Process "$reaperInstallPath\reaper.exe" -ArgumentList [IO.Path]::Combine($pwd, $artist, $title, "$artist - $title.rpp")
 	}
-	else {
-		Write-Host 'REAPER is not installed. Aborting.'
-	}
+
+	Write-Warning 'REAPER is not installed. Aborting.'
 }
