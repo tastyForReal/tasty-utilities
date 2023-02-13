@@ -6,7 +6,7 @@ param (
 
 if (!($env:OS -eq 'Windows_NT')) {
 	Write-Host 'This script can only be run on Windows operating systems.'
-	break
+	Exit 1
 }
 
 function Test-CommandExistence {
@@ -105,6 +105,7 @@ $reaperInstallPath = (Get-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\C
 if ($openAfterSuccess) {
 	if (![string]::IsNullOrEmpty($reaperInstallPath)) {
 		Start-Process "$reaperInstallPath\reaper.exe" -ArgumentList [IO.Path]::Combine($pwd, $artist, $title, "$artist - $title.rpp")
+		Exit 0
 	}
 
 	Write-Warning 'REAPER is not installed. Aborting.'
