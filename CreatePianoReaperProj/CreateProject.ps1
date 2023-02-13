@@ -4,7 +4,7 @@ param (
 	[Parameter(Mandatory = $false)][bool]$Open
 )
 
-if (!([Environment]::OSVersion.Platform -eq 'Win32NT')) {
+if (!($Env:OS -eq 'Windows_NT')) {
 	Write-Error 'You must be running on Windows to do this!'
 	Exit 1
 }
