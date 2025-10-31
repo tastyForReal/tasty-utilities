@@ -1,1 +1,1 @@
-This is a repository of my stuff for my own use.
+Here are my personal scripts I use in my daily life.
