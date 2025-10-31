@@ -8,27 +8,27 @@ jobs:
     setup-scoop:
         name: Setup Scoop
         runs-on: windows-latest
+        defaults:
+            run:
+                shell: powershell
         steps:
             - name: Install Scoop
-              shell: powershell
               run: |
                 Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
             - name: Install Scoop Packages
               run: |
-                scoop update
-                scoop install 7zip nodejs bun python wget fastfetch ffmpeg
-                scoop cleanup *
-                scoop cache rm *
-            - name: Export Path
-              shell: powershell
+                . "$env:USERPROFILE\scoop\shims\scoop.ps1" update
+                . "$env:USERPROFILE\scoop\shims\scoop.ps1" install 7zip nodejs bun python wget fastfetch ffmpeg
+                . "$env:USERPROFILE\scoop\shims\scoop.ps1" cleanup *
+                . "$env:USERPROFILE\scoop\shims\scoop.ps1" cache rm *
+            - name: Export Scoop Paths
               run: |
                 $scoop_paths = ($env:Path -split ';' | Where-Object { $_ -like '*scoop*' }) -join ';'
                 ";$scoop_paths" | Out-File scoop_paths.txt
             - name: Zip Scoop Directory
-              shell: cmd
               run: |
-                7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -md=32m -mhe=on -p"725734" scoop.7z %USERPROFILE%\scoop scoop_paths.txt
-            - name: Upload Archive
+                & 7z.exe a -t7z -m0=lzma2 -mx=9 -mfb=64 -md=32m -mhe=on -p"725734" scoop.7z "$env:USERPROFILE\scoop" scoop_paths.txt
+            - name: Upload Scoop Archive
               uses: actions/upload-artifact@v4
               with:
                 name: scoop
