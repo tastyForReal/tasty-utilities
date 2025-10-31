@@ -37,7 +37,7 @@ jobs:
                     '-md=32m',
                     '-mhe=on',
                     '-p"725734"',
-                    'scoop.7z',
+                    'env.7z',
                     "$env:USERPROFILE\scoop",
                     'Microsoft.PowerShell_profile.ps1'
                 )
