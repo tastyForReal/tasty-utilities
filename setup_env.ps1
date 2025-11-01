@@ -25,6 +25,7 @@ $scoop_packages = @(
     "7zip",
     "adb",
     "cloc",
+    "dotnet-sdk",
     "fastfetch",
     "ffmpeg",
     "gh",
