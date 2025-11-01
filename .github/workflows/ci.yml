@@ -20,20 +20,20 @@ jobs:
             - name: Create User Account for Transferring Ownership
               run: |
                 $options = @{
-                    Name = ${{env.LOCAL_USERNAME}}
-                    Password = ConvertTo-SecureString -String ${{env.LOCAL_USERPASS}} -AsPlainText -Force
+                    Name = "${{env.LOCAL_USERNAME}}"
+                    Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
                     AsPlainText = $true
                     Force = $true
                 }
                 New-LocalUser @options
-                Add-LocalGroupMember -Group "Administrators" -Member ${{env.LOCAL_USERNAME}}
+                Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}"
             - name: Checkout
               uses: actions/checkout@v4
             - name: Setup Environment
               run: |
                 $cred = @{
-                    UserName = ${{env.LOCAL_USERNAME}}
-                    Password = ConvertTo-SecureString -String ${{env.LOCAL_USERPASS}} -AsPlainText -Force
+                    UserName = "${{env.LOCAL_USERNAME}}"
+                    Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
                 }
                 Start-Process -FilePath "pwsh.exe" -ArgumentList "-NoProfile","-NoLogo","-Command",". .\setup_env.ps1" -NoWait -Credential $cred
             - name: Upload Environment Archive
