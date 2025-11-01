@@ -1,5 +1,6 @@
 function Write-Heading {
     param(
+        [Parameter(Mandatory = $true)]
         [string]$Content
     )
 
@@ -31,6 +32,8 @@ Write-Heading "Installing Scoop..."
 Invoke-RestMethod -Uri "https://get.scoop.sh" | Invoke-Expression
 Write-Heading "Installing Scoop packages..."
 . "$env:USERPROFILE\scoop\shims\scoop.ps1" install $scoop_packages
+Write-Heading "Sleeping for 5 seconds..."
+Start-Sleep 5
 Write-Heading "Updating Scoop..."
 . "$env:USERPROFILE\scoop\shims\scoop.ps1" update *
 Write-Heading "Cleaning up..."
