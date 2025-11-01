@@ -33,7 +33,7 @@ $scoop_packages = @(
     "jq",
     "nodejs",
     "oh-my-posh",
-    "python@3.13.9",
+    "python@3.13.9", # NOTE: spotdl requires Python <3.14,>=3.10
     "wget"
 )
 $pwsh_profile = "Microsoft.PowerShell_profile.ps1"
@@ -51,38 +51,22 @@ Write-Heading "Cleaning up..."
 Write-Heading "Purging cache..."
 . "$env:USERPROFILE\scoop\shims\scoop.ps1" cache rm *
 
-$pip_process_stage_one = @{
-    FilePath     = "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"
-    ArgumentList = @(
-        "install",
-        "torch",
-        "torchvision",
-        "--index-url",
-        "https://download.pytorch.org/whl/cu130"
-    )
-    NoNewWindow  = $true
-    Wait         = $true
-}
-    
 Write-Heading "Installing Python packages (1 of 2)..."
-Start-Process @pip_process_stage_one
-
-$pip_process_stage_two = @{
-    FilePath     = "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"
-    ArgumentList = @(
-        "install",
-        "git+https://github.com/giampaolo/psutil",
-        "git+https://github.com/googleapis/python-genai",
-        "git+https://github.com/spotDL/spotify-downloader", # requires Python <3.14,>=3.10
-        "git+https://github.com/yt-dlp/yt-dlp",
-        "git+https://github.com/Yujia-Yan/Transkun"
-    )
-    NoNewWindow  = $true
-    Wait         = $true
-}
+& "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"`
+    "install"`
+    "torch"`
+    "torchvision"`
+    "--index-url"`
+    "https://download.pytorch.org/whl/cu130"
     
 Write-Heading "Installing Python packages (2 of 2)..."
-Start-Process @pip_process_stage_two
+& "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"`
+    "install"`
+    "git+https://github.com/giampaolo/psutil"`
+    "git+https://github.com/googleapis/python-genai"`
+    "git+https://github.com/spotDL/spotify-downloader"`
+    "git+https://github.com/yt-dlp/yt-dlp"`
+    "git+https://github.com/Yujia-Yan/Transkun"
 
 Write-Heading "Exporting configuration..."
 $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:USERPROFILE), '$env:USERPROFILE'
@@ -90,14 +74,7 @@ $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
-$p7z_process = @{
-    FilePath     = "$env:USERPROFILE\scoop\shims\7z.exe"
-    ArgumentList = $p7z_args
-    NoNewWindow  = $true
-    Wait         = $true
-}
-
 Write-Heading "Archiving..."
-Start-Process @p7z_process
+& "$env:USERPROFILE\scoop\shims\7z.exe" $p7z_args
 
 Write-Heading "Done."
