@@ -26,7 +26,6 @@ $scoop_packages = @(
 )
 $pwsh_profile = "Microsoft.PowerShell_profile.ps1"
 $omp_theme = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
-$scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 
 Write-Heading "Installing Scoop..."
 Invoke-RestMethod -Uri "https://get.scoop.sh" | Invoke-Expression
@@ -59,6 +58,7 @@ Write-Heading "Installing Python packages (2 of 2)..."
     "git+https://github.com/Yujia-Yan/Transkun"
 
 Write-Heading "Exporting configuration..."
+$scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:USERPROFILE), '$env:USERPROFILE'
 "`$env:Path += `"; " + $normalized_scoop_path + "`"" | Out-File -FilePath $pwsh_profile -Encoding ascii
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
