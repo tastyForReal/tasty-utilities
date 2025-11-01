@@ -33,7 +33,7 @@ $scoop_packages = @(
     "jq",
     "nodejs",
     "oh-my-posh",
-    "python",
+    "python@3.13.9",
     "wget"
 )
 $pwsh_profile = "Microsoft.PowerShell_profile.ps1"
@@ -73,7 +73,7 @@ $pip_process_stage_two = @{
         "install",
         "git+https://github.com/giampaolo/psutil",
         "git+https://github.com/googleapis/python-genai",
-        "git+https://github.com/spotDL/spotify-downloader",
+        "git+https://github.com/spotDL/spotify-downloader", # requires Python <3.14,>=3.10
         "git+https://github.com/yt-dlp/yt-dlp",
         "git+https://github.com/Yujia-Yan/Transkun"
     )
