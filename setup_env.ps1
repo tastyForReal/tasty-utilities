@@ -8,19 +8,6 @@ function Write-Heading {
     Write-Host ("=" * 32)
 }
 
-$p7z_args = @(
-    "a",
-    "-t7z",
-    "-m0=lzma2",
-    "-mx=9",
-    "-mfb=64",
-    "-md=32m",
-    "-mhe=on",
-    "-p`"725734`"",
-    "env.7z",
-    "$env:USERPROFILE\scoop",
-    "Microsoft.PowerShell_profile.ps1"
-)
 $scoop_packages = @(
     "7zip",
     "adb",
@@ -75,6 +62,17 @@ $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:
 Get-Content $pwsh_profile
 
 Write-Heading "Archiving..."
-& "$env:USERPROFILE\scoop\shims\7z.exe" $p7z_args
+& "$env:USERPROFILE\scoop\shims\7z.exe"`
+    "a"`
+    "-t7z"`
+    "-m0=lzma2"`
+    "-mx=9"`
+    "-mfb=64"`
+    "-md=32m"`
+    "-mhe=on"`
+    "-p`"725734`""`
+    "env.7z"`
+    "$env:USERPROFILE\scoop"`
+    "Microsoft.PowerShell_profile.ps1"
 
 Write-Heading "Done."
