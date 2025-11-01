@@ -22,8 +22,6 @@ jobs:
                 $options = @{
                     Name = "${{env.LOCAL_USERNAME}}"
                     Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
-                    AsPlainText = $true
-                    Force = $true
                 }
                 New-LocalUser @options
                 Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}"
