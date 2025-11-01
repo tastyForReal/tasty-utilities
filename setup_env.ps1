@@ -41,10 +41,10 @@ $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 
 Write-Heading "Installing Scoop..."
 Invoke-RestMethod -Uri "https://get.scoop.sh" | Invoke-Expression
-Write-Heading "Updating Scoop..."
-. "$env:USERPROFILE\scoop\shims\scoop.ps1" update *
 Write-Heading "Installing Scoop packages..."
 . "$env:USERPROFILE\scoop\shims\scoop.ps1" install $scoop_packages
+Write-Heading "Updating Scoop..."
+. "$env:USERPROFILE\scoop\shims\scoop.ps1" update *
 Write-Heading "Cleaning up..."
 . "$env:USERPROFILE\scoop\shims\scoop.ps1" cleanup *
 Write-Heading "Purging cache..."
