@@ -4,6 +4,11 @@ name: ci
 permissions:
     contents: read
 
+env:
+    LOCAL_USERNAME: DailyDriver
+    LOCAL_USERPASS: 123
+    INSTALL_PACKAGES: 0
+
 jobs:
     setup-scoop:
         name: Setup Environment
@@ -12,10 +17,19 @@ jobs:
             run:
                 shell: pwsh
         steps:
+            - name: Create User Account for Transferring Ownership
+              run: |
+                New-LocalUser -Name ${{env.LOCAL_USERNAME}} -Password (ConvertTo-SecureString -String ${{env.LOCAL_USERPASS}} -AsPlainText -Force)
+                Add-LocalGroupMember -Group "Administrators" -Member ${{env.LOCAL_USERNAME}}
             - name: Checkout
               uses: actions/checkout@v4
             - name: Setup Environment
-              run: . .\setup_env.ps1
+              run: |
+                $cred = @{
+                    UserName = ${{env.LOCAL_USERNAME}}
+                    Password = ConvertTo-SecureString -String ${{env.LOCAL_USERPASS}} -AsPlainText -Force
+                }
+                Start-Process -FilePath "pwsh.exe" -ArgumentList "-NoProfile","-NoLogo","-Command",". .\setup_env.ps1" -NoWait -Credential $cred
             - name: Upload Environment Archive
               uses: actions/upload-artifact@v4
               with:

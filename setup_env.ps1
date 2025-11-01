@@ -29,33 +29,36 @@ $omp_theme = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/t
 
 Write-Heading "Installing Scoop..."
 Invoke-RestMethod -Uri "https://get.scoop.sh" | Invoke-Expression
-Write-Heading "Installing Scoop packages..."
-. "$env:USERPROFILE\scoop\shims\scoop.ps1" install $scoop_packages
-Write-Heading "Sleeping for 5 seconds..."
-Start-Sleep 5
-Write-Heading "Updating Scoop..."
-. "$env:USERPROFILE\scoop\shims\scoop.ps1" update *
-Write-Heading "Cleaning up..."
-. "$env:USERPROFILE\scoop\shims\scoop.ps1" cleanup *
-Write-Heading "Purging cache..."
-. "$env:USERPROFILE\scoop\shims\scoop.ps1" cache rm *
 
-Write-Heading "Installing Python packages (1 of 2)..."
-& "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"`
-    "install"`
-    "torch"`
-    "torchvision"`
-    "--index-url"`
-    "https://download.pytorch.org/whl/cu130"
+if ($env:INSTALL_PACKAGES -eq 1) {
+    Write-Heading "Installing Scoop packages..."
+    . "$env:USERPROFILE\scoop\shims\scoop.ps1" install $scoop_packages
+    Write-Heading "Sleeping for 5 seconds..."
+    Start-Sleep 5
+    Write-Heading "Updating Scoop..."
+    . "$env:USERPROFILE\scoop\shims\scoop.ps1" update *
+    Write-Heading "Cleaning up..."
+    . "$env:USERPROFILE\scoop\shims\scoop.ps1" cleanup *
+    Write-Heading "Purging cache..."
+    . "$env:USERPROFILE\scoop\shims\scoop.ps1" cache rm *
+
+    Write-Heading "Installing Python packages (1 of 2)..."
+    & "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"`
+        "install"`
+        "torch"`
+        "torchvision"`
+        "--index-url"`
+        "https://download.pytorch.org/whl/cu130"
     
-Write-Heading "Installing Python packages (2 of 2)..."
-& "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"`
-    "install"`
-    "git+https://github.com/giampaolo/psutil"`
-    "git+https://github.com/googleapis/python-genai"`
-    "git+https://github.com/spotDL/spotify-downloader"`
-    "git+https://github.com/yt-dlp/yt-dlp"`
-    "git+https://github.com/Yujia-Yan/Transkun"
+    Write-Heading "Installing Python packages (2 of 2)..."
+    & "$env:USERPROFILE\scoop\apps\python\current\Scripts\pip.exe"`
+        "install"`
+        "git+https://github.com/giampaolo/psutil"`
+        "git+https://github.com/googleapis/python-genai"`
+        "git+https://github.com/spotDL/spotify-downloader"`
+        "git+https://github.com/yt-dlp/yt-dlp"`
+        "git+https://github.com/Yujia-Yan/Transkun"
+}
 
 Write-Heading "Exporting configuration..."
 $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
