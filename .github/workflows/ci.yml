@@ -21,4 +21,4 @@ jobs:
               with:
                 name: env
                 path: env
-                compression-level: 0
+                compression-level: 9
