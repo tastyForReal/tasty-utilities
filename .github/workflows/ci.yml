@@ -12,42 +12,10 @@ jobs:
             run:
                 shell: pwsh
         steps:
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Setup Environment
-              run: |
-                Invoke-RestMethod -Uri 'https://get.scoop.sh' | Invoke-Expression
-
-                . "$env:USERPROFILE\scoop\shims\scoop.ps1" update *
-                . "$env:USERPROFILE\scoop\shims\scoop.ps1" install 7zip fastfetch ffmpeg git nodejs oh-my-posh python wget
-                . "$env:USERPROFILE\scoop\shims\scoop.ps1" cleanup *
-                . "$env:USERPROFILE\scoop\shims\scoop.ps1" cache rm *
-
-                $scoop_paths = $env:Path -split ';' | Where-Object { $_ -like '*scoop*' }
-                $normalized_scoop_path = ($scoop_paths -join ';') -replace [regex]::Escape($env:USERPROFILE), '$env:USERPROFILE'
-                '$env:Path += ";' + $normalized_scoop_path + '"' | Out-File -FilePath 'Microsoft.PowerShell_profile.ps1' -Encoding ascii
-                "oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json' | Invoke-Expression" | Out-File -FilePath 'Microsoft.PowerShell_profile.ps1' -Encoding ascii -Append
-                Get-Content 'Microsoft.PowerShell_profile.ps1'
-            - name: Zip Environment
-              run: |
-                $7z_args = @(
-                    'a',
-                    '-t7z',
-                    '-m0=lzma2',
-                    '-mx=9',
-                    '-mfb=64',
-                    '-md=32m',
-                    '-mhe=on',
-                    '-p"725734"',
-                    'env.7z',
-                    "$env:USERPROFILE\scoop",
-                    'Microsoft.PowerShell_profile.ps1'
-                )
-                $7z_process = @{
-                    FilePath     = "$env:USERPROFILE\scoop\shims\7z.exe"
-                    ArgumentList = $7z_args
-                    NoNewWindow  = $true
-                    Wait         = $true
-                }
-                Start-Process @7z_process
+              run: . .\setup_env.ps1
             - name: Upload Environment Archive
               uses: actions/upload-artifact@v4
               with:
