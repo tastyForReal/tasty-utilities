@@ -61,18 +61,5 @@ $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
-Write-Heading "Archiving..."
-& "$env:USERPROFILE\scoop\shims\7z.exe"`
-    "a"`
-    "-t7z"`
-    "-m0=lzma2"`
-    "-mx=9"`
-    "-mfb=64"`
-    "-md=32m"`
-    "-mhe=on"`
-    "-p`"725734`""`
-    "env.7z"`
-    "$env:USERPROFILE\scoop"`
-    "Microsoft.PowerShell_profile.ps1"
-
-Write-Heading "Done."
+Write-Heading "Creating junction link for archiving..."
+New-Item -ItemType Junction -Path ".\scoop" -Target "$env:USERPROFILE\scoop"

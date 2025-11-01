@@ -20,4 +20,5 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: env
-                path: env.7z
+                path: scoop
+                compression-level: 0
