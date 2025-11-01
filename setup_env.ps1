@@ -60,7 +60,7 @@ Write-Heading "Installing Python packages (2 of 2)..."
 Write-Heading "Exporting configuration..."
 $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:USERPROFILE), '$env:USERPROFILE'
-"`$env:Path += `"; " + $normalized_scoop_path + "`"" | Out-File -FilePath $pwsh_profile -Encoding ascii
+"`$env:Path += `";" + $normalized_scoop_path + "`"" | Out-File -FilePath $pwsh_profile -Encoding ascii
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
