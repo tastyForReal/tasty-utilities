@@ -85,6 +85,6 @@ Copy-Item $pwsh_profile ".\env"
 if (Test-Path ".\recreate_junctions.ps1") { 
     Copy-Item ".\recreate_junctions.ps1" ".\env" 
 }
-Start-Process -FilePath "robocopy.exe" -NoNewWindow -Wait -ArgumentList $scoop_dir,".\env\scoop","/e","/xj"
+Start-Process -FilePath "robocopy.exe" -NoNewWindow -Wait -ArgumentList $scoop_dir,".\env\scoop","/e","/xj","/ns","/nc","/np","/nfl","/ndl"
 
 Write-Heading "Completed."
