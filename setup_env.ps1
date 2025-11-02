@@ -85,4 +85,4 @@ Copy-Item $pwsh_profile ".\env"
 if (Test-Path ".\recreate_junctions.ps1") { 
     Copy-Item ".\recreate_junctions.ps1" ".\env" 
 }
-Get-ChildItem $scoop_dir -Recurse | Copy-Item -Destination ".\env"
+& robocopy.exe $scoop_dir ".\env\scoop" /E /XJ
