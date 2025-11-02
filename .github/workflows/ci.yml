@@ -19,12 +19,17 @@ jobs:
         steps:
             - name: Create User Account for Transferring Ownership
               run: |
-                $options = @{
-                    Name = "${{env.LOCAL_USERNAME}}"
-                    Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
+                try {
+                    $options = @{
+                        Name = "${{env.LOCAL_USERNAME}}"
+                        Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
+                    }
+                    New-LocalUser @options
+                    Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}
+                } catch {
+                    Write-Host $_
+                    throw
                 }
-                New-LocalUser @options
-                Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}"
             - name: Checkout
               uses: actions/checkout@v4
             - name: Setup Environment
