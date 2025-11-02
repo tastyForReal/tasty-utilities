@@ -4,9 +4,9 @@ function Write-Heading {
         [string]$Content
     )
 
-    Write-Host ("=" * 32)
+    Write-Host ("-" * $Content.Length)
     Write-Host $Content
-    Write-Host ("=" * 32)
+    Write-Host ("-" * $Content.Length)
 }
 
 $local_username = "DailyDriver"
