@@ -77,8 +77,3 @@ $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:
 "`$env:Path += `";" + $normalized_scoop_path + "`"" | Out-File -FilePath $pwsh_profile -Encoding ascii
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
-    
-Write-Heading "Creating directory for archiving..."
-New-Item -ItemType Directory -Path "$WorkingDirectory\env" -Verbose
-New-Item -ItemType Junction -Path "$WorkingDirectory\env\scoop" -Target "$env:USERPROFILE\scoop" -Verbose
-Move-Item $pwsh_profile "$WorkingDirectory\env" -Verbose
