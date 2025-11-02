@@ -79,5 +79,6 @@ Write-Heading "Generating PS script for recreating junctions..."
 
 Write-Heading "Moving contents for archiving..."
 New-Item -ItemType Directory -Path ".\env"
+& takeown.exe /f $scoop_dir
 Move-Item $scoop_dir ".\env"
 Move-Item $pwsh_profile ".\env"
