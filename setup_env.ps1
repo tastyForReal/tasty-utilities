@@ -27,6 +27,8 @@ $scoop_packages = @(
 $pwsh_profile = "Microsoft.PowerShell_profile.ps1"
 $omp_theme = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
 
+Write-Heading "User profile: $env:USERPROFILE"
+
 Write-Heading "Installing Scoop..."
 $env:GITHUB_ACTIONS = $true
 $env:CI = $true
@@ -69,7 +71,9 @@ $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
-Write-Heading "Creating directory for archiving..."
-New-Item -ItemType Directory -Path ".\env"
-New-Item -ItemType Junction -Path ".\env\scoop" -Target "$env:USERPROFILE\scoop"
-Move-Item $pwsh_profile ".\env"
+if ($env:INSTALL_PACKAGES -eq 1) {
+    Write-Heading "Creating directory for archiving..."
+    New-Item -ItemType Directory -Path ".\env"
+    New-Item -ItemType Junction -Path ".\env\scoop" -Target "$env:USERPROFILE\scoop"
+    Move-Item $pwsh_profile ".\env"
+}
