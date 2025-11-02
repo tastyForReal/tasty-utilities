@@ -17,6 +17,7 @@ New-Item -ItemType Directory -Path $scoop_dir -Force | Out-Null
 $scoop_packages = @(
     "7zip",
     "adb",
+    "bun",
     "cloc",
     "dotnet-sdk",
     "fastfetch",
