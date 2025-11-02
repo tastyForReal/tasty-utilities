@@ -28,6 +28,8 @@ foreach ($junction in $junctions) {
     $target = $junction.Target
     $command_string = "New-Item -ItemType Junction -Path '$junction_path' -Target '$target' -Force"
     $recreation_commands += $command_string
+    & takeown.exe /f /r "$junction_path"
+    & icacls.exe "$junction_path" /grant "$env:USERNAME`:(F)"
 }
 
 $recreation_commands | Set-Content -Path $output_script_path -Encoding ascii
