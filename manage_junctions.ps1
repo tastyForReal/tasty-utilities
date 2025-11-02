@@ -33,7 +33,7 @@ foreach ($junction in $junctions) {
 $recreation_commands | Set-Content -Path $output_script_path -Encoding ascii
 Write-Host "Successfully created '$output_script_path'."
 
-Write-Host "Removing original junction points to save disk space..."
+Write-Host "Removing original junction points to save disk space for CI..."
 
 foreach ($junction in $junctions) {
     Remove-Item -Path $junction.FullName -Force
