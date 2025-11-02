@@ -81,8 +81,8 @@ Write-Heading "Generating PS script for junction points recreation..."
 
 Write-Heading "Copying contents for archiving..."
 New-Item -ItemType Directory -Path ".\env"
-Copy-Item $scoop_dir ".\env" -Recurse
 Copy-Item $pwsh_profile ".\env"
 if (Test-Path ".\recreate_junctions.ps1") { 
     Copy-Item ".\recreate_junctions.ps1" ".\env" 
 }
+Get-ChildItem $scoop_dir -Recurse | Copy-Item -Destination ".\env"
