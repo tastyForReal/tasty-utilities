@@ -75,10 +75,10 @@ $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
-Write-Heading "Generating PS script for recreating junctions..."
+Write-Heading "Generating PS script for junctions recreation..."
 . ".\manage_junctions.ps1" -Path $scoop_dir
 
-Write-Heading "Moving contents for archiving..."
+Write-Heading "Copying contents for archiving..."
 New-Item -ItemType Directory -Path ".\env"
-Move-Item $scoop_dir ".\env"
-Move-Item $pwsh_profile ".\env"
+Copy-Item $scoop_dir ".\env" -Recurse
+Copy-Item $pwsh_profile ".\env" -Recurse
