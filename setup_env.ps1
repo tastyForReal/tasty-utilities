@@ -35,10 +35,10 @@ Write-Heading "Installing Scoop..."
 Invoke-RestMethod -Uri "https://get.scoop.sh" | Out-File ".\install_scoop.ps1" -Encoding ascii
 . ".\install_scoop.ps1" -ScoopDir $local_userprofile
 
-Write-Heading "Installing Scoop packages..."
-. "$local_userprofile\scoop\shims\scoop.ps1" install $scoop_packages
 
 if ($env:INSTALL_PACKAGES -eq 'on') {
+    Write-Heading "Installing Scoop packages..."
+    . "$local_userprofile\scoop\shims\scoop.ps1" install $scoop_packages
 
     Write-Heading "Updating Scoop..."
     . "$local_userprofile\scoop\shims\scoop.ps1" update *
@@ -56,7 +56,7 @@ if ($env:INSTALL_PACKAGES -eq 'on') {
         "torchvision"`
         "--index-url"`
         "https://download.pytorch.org/whl/cu130"
-    
+
     Write-Heading "Installing Python packages (2 of 2)..."
     & "$local_userprofile\scoop\apps\python\current\Scripts\pip.exe"`
         "install"`
