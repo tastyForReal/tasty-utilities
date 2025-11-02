@@ -28,7 +28,7 @@ foreach ($junction in $junctions) {
     $target = $junction.Target
     $command_string = "New-Item -ItemType Junction -Path '$junction_path' -Target '$target' -Force"
     $recreation_commands += $command_string
-    & takeown.exe /f /r "$junction_path"
+    & takeown.exe /f "$junction_path" /r
     & icacls.exe "$junction_path" /grant "$env:USERNAME`:(F)"
 }
 
