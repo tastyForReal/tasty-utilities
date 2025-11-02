@@ -11,6 +11,8 @@ function Write-Heading {
 
 $local_username = "DailyDriver"
 $local_userprofile = "C:\Users\$local_username"
+$scoop_dir = "$local_userprofile\scoop"
+New-Item -ItemType Directory -Path $scoop_dir -Force | Out-Null
 
 $scoop_packages = @(
     "7zip",
@@ -33,8 +35,7 @@ $omp_theme = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/t
 Write-Heading "Installing Scoop..."
 
 Invoke-RestMethod -Uri "https://get.scoop.sh" | Out-File ".\install_scoop.ps1" -Encoding ascii
-. ".\install_scoop.ps1" -ScoopDir $local_userprofile
-
+. ".\install_scoop.ps1" -ScoopDir $scoop_dir
 
 if ($env:INSTALL_PACKAGES -eq 'on') {
     Write-Heading "Installing Scoop packages..."
@@ -74,9 +75,9 @@ $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 Get-Content $pwsh_profile
 
 Write-Heading "Generating PS script for recreating junctions..."
-. ".\manage_junctions.ps1" -Path "$local_userprofile\scoop"
+. ".\manage_junctions.ps1" -Path $scoop_dir
 
 Write-Heading "Moving contents for archiving..."
 New-Item -ItemType Directory -Path ".\env"
-Move-Item "$local_userprofile\scoop" ".\env"
+Move-Item $scoop_dir ".\env"
 Move-Item $pwsh_profile ".\env"
