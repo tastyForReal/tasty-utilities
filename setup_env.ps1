@@ -15,6 +15,8 @@ function Write-Heading {
     Write-Host ("=" * 32)
 }
 
+Write-Heading "User profile: $env:USERPROFILE"
+Write-Heading ("Working directory: " + $WorkingDirectory)
 $scoop_packages = @(
     "7zip",
     "adb",
@@ -30,11 +32,8 @@ $scoop_packages = @(
     "python@3.13.9", # NOTE: spotdl requires Python <3.14,>=3.10
     "wget"
 )
-$pwsh_profile = "Microsoft.PowerShell_profile.ps1"
 $omp_theme = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
-
-Write-Heading "User profile: $env:USERPROFILE"
-Write-Heading ("Working directory: " + $WorkingDirectory)
+$pwsh_profile = "$WorkingDirectory\Microsoft.PowerShell_profile.ps1"
 
 Write-Heading "Installing Scoop..."
 $env:GITHUB_ACTIONS = $true
