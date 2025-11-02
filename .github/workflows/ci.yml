@@ -29,10 +29,8 @@ jobs:
               uses: actions/checkout@v4
             - name: Setup Environment
               run: |
-                $cred = @{
-                    UserName = "${{env.LOCAL_USERNAME}}"
-                    Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
-                }
+                $pass = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
+                $cred = [System.Management.Automation.PSCredential]::new("${{env.LOCAL_USERNAME}}", $pass)
                 Start-Process -FilePath "pwsh.exe" -ArgumentList "-NoProfile","-NoLogo","-Command",". .\setup_env.ps1" -NoWait -Credential $cred
             - name: Upload Environment Archive
               uses: actions/upload-artifact@v4
