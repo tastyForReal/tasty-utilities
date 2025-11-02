@@ -76,6 +76,10 @@ $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
+Write-Heading "Taking ownership of Scoop files and folders..."
+& takeown.exe /F "$scoop_dir" /R /D Y
+& icacls.exe "$scoop_dir" /grant "$env:USERNAME`:(OI)(CI)F" /T
+
 Write-Heading "Generating PS script for junction points recreation..."
 . ".\manage_junctions.ps1" -Path $scoop_dir
 
