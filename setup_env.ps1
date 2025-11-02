@@ -28,7 +28,7 @@ $pwsh_profile = "Microsoft.PowerShell_profile.ps1"
 $omp_theme = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
 
 Write-Heading "User profile: $env:USERPROFILE"
-Write-Heading "Working directory: " + $pwd.Path
+Write-Heading ("Working directory: " + $pwd.Path)
 
 Write-Heading "Installing Scoop..."
 $env:GITHUB_ACTIONS = $true
