@@ -1,3 +1,9 @@
+param(
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$WorkingDirectory
+)
+
 function Write-Heading {
     param(
         [Parameter(Mandatory = $true)]
@@ -28,10 +34,7 @@ $pwsh_profile = "Microsoft.PowerShell_profile.ps1"
 $omp_theme = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
 
 Write-Heading "User profile: $env:USERPROFILE"
-if (!$PSScriptRoot) {
-    throw "`$PSScriptRoot is empty."
-}
-Write-Heading ("Working directory: " + $PSScriptRoot)
+Write-Heading ("Working directory: " + $WorkingDirectory)
 
 Write-Heading "Installing Scoop..."
 $env:GITHUB_ACTIONS = $true
@@ -76,6 +79,6 @@ $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:
 Get-Content $pwsh_profile
     
 Write-Heading "Creating directory for archiving..."
-New-Item -ItemType Directory -Path "$PSScriptRoot\env"
-New-Item -ItemType Junction -Path "$PSScriptRoot\env\scoop" -Target "$env:USERPROFILE\scoop"
-Move-Item $pwsh_profile "$PSScriptRoot\env"
+New-Item -ItemType Directory -Path "$WorkingDirectory\env"
+New-Item -ItemType Junction -Path "$WorkingDirectory\env\scoop" -Target "$env:USERPROFILE\scoop"
+Move-Item $pwsh_profile "$WorkingDirectory\env"
