@@ -6,7 +6,7 @@ permissions:
 
 env:
     LOCAL_USERNAME: DailyDriver
-    LOCAL_USERPASS: 123
+    LOCAL_USERPASS: 4FW9kwTsGMGf4VvjZ33mfsET
     INSTALL_PACKAGES: 0
 
 jobs:
@@ -19,17 +19,12 @@ jobs:
         steps:
             - name: Create User Account for Transferring Ownership
               run: |
-                try {
-                    $options = @{
-                        Name = "${{env.LOCAL_USERNAME}}"
-                        Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
-                    }
-                    New-LocalUser @options
-                    Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}"
-                } catch {
-                    Write-Host $_
-                    throw
+                $options = @{
+                    Name = "${{env.LOCAL_USERNAME}}"
+                    Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
                 }
+                New-LocalUser @options
+                Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}"
             - name: Checkout
               uses: actions/checkout@v4
             - name: Setup Environment
