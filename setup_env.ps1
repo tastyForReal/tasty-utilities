@@ -79,6 +79,6 @@ $normalized_scoop_path = ($scoop_paths -join ";") -replace [regex]::Escape($env:
 Get-Content $pwsh_profile
     
 Write-Heading "Creating directory for archiving..."
-New-Item -ItemType Directory -Path "$WorkingDirectory\env"
-New-Item -ItemType Junction -Path "$WorkingDirectory\env\scoop" -Target "$env:USERPROFILE\scoop"
-Move-Item $pwsh_profile "$WorkingDirectory\env"
+New-Item -ItemType Directory -Path "$WorkingDirectory\env" -Verbose
+New-Item -ItemType Junction -Path "$WorkingDirectory\env\scoop" -Target "$env:USERPROFILE\scoop" -Verbose
+Move-Item $pwsh_profile "$WorkingDirectory\env" -Verbose
