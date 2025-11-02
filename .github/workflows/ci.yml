@@ -31,7 +31,7 @@ jobs:
               run: |
                 $pass = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
                 $cred = [System.Management.Automation.PSCredential]::new("${{env.LOCAL_USERNAME}}", $pass)
-                Start-Process -FilePath "pwsh.exe" -ArgumentList "-NoProfile","-NoLogo","-Command",". .\setup_env.ps1" -NoNewWindow -Wait -Credential $cred
+                Invoke-Command -Credential $cred -FilePath ".\setup_env.ps1"
             - name: Upload Environment Archive
               uses: actions/upload-artifact@v4
               with:
