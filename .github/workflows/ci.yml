@@ -2,7 +2,8 @@ on: [push]
 name: ci
 
 env:
-    INSTALL_PACKAGES: 'off'
+    INSTALL_SCOOP_PACKAGES: 'on'
+    INSTALL_PYTHON_PACKAGES: 'off'
 
 permissions:
     contents: read

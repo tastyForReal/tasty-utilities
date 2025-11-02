@@ -13,7 +13,6 @@ $local_username = "DailyDriver"
 $local_userprofile = "C:\Users\$local_username"
 $scoop_dir = "$local_userprofile\scoop"
 New-Item -ItemType Directory -Path $scoop_dir -Force | Out-Null
-& takeown.exe /f $local_userprofile
 
 $scoop_packages = @(
     "7zip",
@@ -38,7 +37,7 @@ Write-Heading "Installing Scoop..."
 Invoke-RestMethod -Uri "https://get.scoop.sh" | Out-File ".\install_scoop.ps1" -Encoding ascii
 . ".\install_scoop.ps1" -ScoopDir $scoop_dir
 
-if ($env:INSTALL_PACKAGES -eq 'on') {
+if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
     Write-Heading "Installing Scoop packages..."
     . "$local_userprofile\scoop\shims\scoop.ps1" install $scoop_packages
 
@@ -50,7 +49,9 @@ if ($env:INSTALL_PACKAGES -eq 'on') {
 
     Write-Heading "Purging cache..."
     . "$local_userprofile\scoop\shims\scoop.ps1" cache rm *
+}
 
+if ($env:INSTALL_PYTHON_PACKAGES -eq 'on') {
     Write-Heading "Installing Python packages (1 of 2)..."
     & "$local_userprofile\scoop\apps\python\current\Scripts\pip.exe"`
         "install"`
@@ -75,10 +76,13 @@ $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
-Write-Heading "Generating PS script for junctions recreation..."
+Write-Heading "Generating PS script for junction points recreation..."
 . ".\manage_junctions.ps1" -Path $scoop_dir
 
 Write-Heading "Copying contents for archiving..."
 New-Item -ItemType Directory -Path ".\env"
 Copy-Item $scoop_dir ".\env" -Recurse
-Copy-Item $pwsh_profile ".\env" -Recurse
+Copy-Item $pwsh_profile ".\env"
+if (Test-Path ".\recreate_junctions.ps1") { 
+    Copy-Item ".\recreate_junctions.ps1" ".\env" 
+}
