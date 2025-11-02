@@ -28,17 +28,7 @@ foreach ($junction in $junctions) {
     $target = $junction.Target
     $command_string = "New-Item -ItemType Junction -Path '$junction_path' -Target '$target' -Force"
     $recreation_commands += $command_string
-    & takeown.exe /f "$junction_path" /r
-    & icacls.exe "$junction_path" /grant "$env:USERNAME`:(F)"
 }
 
 $recreation_commands | Set-Content -Path $output_script_path -Encoding ascii
 Write-Host "Successfully created '$output_script_path'."
-
-Write-Host "Removing original junction points to save disk space for CI..."
-
-foreach ($junction in $junctions) {
-    Remove-Item -Path $junction.FullName -Force
-}
-
-Write-Host "Process complete."
