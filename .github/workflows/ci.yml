@@ -32,8 +32,12 @@ jobs:
                 $pass = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
                 $cred = [System.Management.Automation.PSCredential]::new("${{env.LOCAL_USERNAME}}", $pass)
                 Invoke-Command -ComputerName $env:COMPUTERNAME -Credential $cred -FilePath ".\setup_env.ps1" -ArgumentList $pwd.Path
+            - name: Create Directory for Archiving
+              run: |
+                New-Item -ItemType Directory -Path ".\env" -Verbose
+                New-Item -ItemType Junction -Path ".\env\scoop" -Target "C:\Users\${{env.LOCAL_USERNAME}}\scoop" -Verbose
+                Move-Item "Microsoft.PowerShell_profile.ps1" ".\env" -Verbose
             - name: Upload Environment Archive
-              if: ${{env.INSTALL_PACKAGES == 1}}
               uses: actions/upload-artifact@v4
               with:
                 name: env
