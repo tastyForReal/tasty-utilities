@@ -25,7 +25,7 @@ jobs:
                         Password = ConvertTo-SecureString -String "${{env.LOCAL_USERPASS}}" -AsPlainText -Force
                     }
                     New-LocalUser @options
-                    Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}
+                    Add-LocalGroupMember -Group "Administrators" -Member "${{env.LOCAL_USERNAME}}"
                 } catch {
                     Write-Host $_
                     throw
