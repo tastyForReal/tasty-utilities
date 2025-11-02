@@ -76,7 +76,7 @@ $scoop_paths = $env:Path -split ";" | Where-Object { $_ -like "*scoop*" }
 "oh-my-posh init pwsh --config " + $omp_theme + " | Invoke-Expression" | Out-File -FilePath $pwsh_profile -Encoding ascii -Append
 Get-Content $pwsh_profile
 
-Write-Heading "Generating PS script for junction points recreation..."
+Write-Heading "Managing junctions..."
 . ".\manage_junctions.ps1" -Path $scoop_dir
 
 Write-Heading "Copying contents for archiving..."
@@ -86,3 +86,5 @@ if (Test-Path ".\recreate_junctions.ps1") {
     Copy-Item ".\recreate_junctions.ps1" ".\env" 
 }
 & robocopy.exe $scoop_dir ".\env\scoop" /E /XJ
+
+Write-Heading "Completed."
