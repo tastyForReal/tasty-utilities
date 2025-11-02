@@ -1,5 +1,8 @@
-on: [push, pull_request]
+on: [push]
 name: ci
+
+env:
+    INSTALL_PACKAGES: 'off'
 
 permissions:
     contents: read
