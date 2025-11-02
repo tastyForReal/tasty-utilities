@@ -9,18 +9,18 @@ permissions:
     contents: read
 
 jobs:
-    setup-scoop:
-        name: Setup Environment
+    setup-env:
+        name: Setup environment
         runs-on: windows-latest
         defaults:
             run:
                 shell: pwsh
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Environment
+              uses: actions/checkout@v5
+            - name: Setup environment
               run: . .\setup_env.ps1
-            - name: Upload Environment Archive
+            - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:
                 name: env
