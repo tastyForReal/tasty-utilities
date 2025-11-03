@@ -39,7 +39,7 @@ Invoke-RestMethod -Uri "https://get.scoop.sh" | Out-File ".\install_scoop.ps1" -
 . ".\install_scoop.ps1" -ScoopDir $scoop_dir
 
 if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
-    Write-Heading "Updating Scoop buckets..."
+    Write-Heading "Updating Scoop..."
     . "$local_userprofile\scoop\shims\scoop.ps1" update
     
     Write-Heading "Installing Scoop packages..."
