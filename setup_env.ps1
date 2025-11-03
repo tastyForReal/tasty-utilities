@@ -11,7 +11,11 @@ function Write-Heading {
 
 $local_username = $env:LOCAL_USERNAME, "DailyDriver" | Where-Object { -not [string]::IsNullOrEmpty($_) } | Select-Object -First 1
 $local_userprofile = "C:\Users\$local_username"
+
 $scoop_dir = "$local_userprofile\scoop"
+$scoop_exe = "$scoop_dir\shims\scoop.ps1"
+$pip_exe = "$scoop_dir\apps\python\current\Scripts\pip.exe"
+
 New-Item -ItemType Directory -Path $scoop_dir -Force | Out-Null
 
 $scoop_packages = @(
@@ -40,21 +44,21 @@ Invoke-RestMethod -Uri "https://get.scoop.sh" | Out-File ".\install_scoop.ps1" -
 
 if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
     Write-Heading "Updating Scoop..."
-    . "$local_userprofile\scoop\shims\scoop.ps1" update
+    . $scoop_exe update
     
     Write-Heading "Installing Scoop packages..."
-    . "$local_userprofile\scoop\shims\scoop.ps1" install $scoop_packages
+    . $scoop_exe install $scoop_packages
 
     Write-Heading "Cleaning up..."
-    . "$local_userprofile\scoop\shims\scoop.ps1" cleanup *
+    . $scoop_exe cleanup *
 
     Write-Heading "Purging cache..."
-    . "$local_userprofile\scoop\shims\scoop.ps1" cache rm *
+    . $scoop_exe cache rm *
 }
 
-if ($env:INSTALL_PYTHON_PACKAGES -eq 'on') {
+if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_exe) -and (Test-Path $pip_exe)) {
     Write-Heading "Installing Python packages (1 of 2)..."
-    & "$local_userprofile\scoop\apps\python\current\Scripts\pip.exe"`
+    & $pip_exe `
         "install"`
         "torch"`
         "torchvision"`
@@ -62,7 +66,7 @@ if ($env:INSTALL_PYTHON_PACKAGES -eq 'on') {
         "https://download.pytorch.org/whl/cu130"
 
     Write-Heading "Installing Python packages (2 of 2)..."
-    & "$local_userprofile\scoop\apps\python\current\Scripts\pip.exe"`
+    & $pip_exe `
         "install"`
         "git+https://github.com/giampaolo/psutil"`
         "git+https://github.com/googleapis/python-genai"`
