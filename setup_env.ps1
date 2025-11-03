@@ -63,11 +63,11 @@ if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
 if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_exe) -and (Test-Path $pip_exe)) {
     Write-Heading "Installing Python packages (PyTorch)..."
     $pip_args_pytorch = @("install", $pytorch_packages, "--index-url", $pytorch_index_url)
-    & $pip_exe $pip_args_pytorch
+    Start-Process -FilePath $pip_exe -ArgumentList $pip_args_pytorch -NoNewWindow -Wait
 
     Write-Heading "Installing Python packages (from Git)..."
     $pip_args_git = @("install", $python_git_packages)
-    & $pip_exe $pip_args_git
+    Start-Process -FilePath $pip_exe -ArgumentList $pip_args_git -NoNewWindow -Wait
 }
 
 Write-Heading "Exporting configuration to PowerShell profile..."
