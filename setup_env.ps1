@@ -9,7 +9,7 @@ function Write-Heading {
     Write-Host ("-" * $Content.Length)
 }
 
-$local_username = "DailyDriver"
+$local_username = $env:LOCAL_USERNAME, "DailyDriver" | Where-Object { -not [string]::IsNullOrEmpty($_) } | Select-Object -First 1
 $local_userprofile = "C:\Users\$local_username"
 $scoop_dir = "$local_userprofile\scoop"
 New-Item -ItemType Directory -Path $scoop_dir -Force | Out-Null
