@@ -45,6 +45,7 @@ $scoop_dir = Join-Path $local_userprofile "scoop"
 $scoop_ps1 = Join-Path $scoop_dir "shims\scoop.ps1"
 $pip_exe = Join-Path $scoop_dir "apps\python\current\Scripts\pip.exe"
 $npm_cmd = Join-Path $scoop_dir "apps\nodejs\current\npm.cmd"
+$bun_cmd = Join-Path $scoop_dir "apps\bun\current\bun.exe"
 
 Write-Heading "Installing Scoop..."
 
@@ -70,19 +71,19 @@ if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
 }
 
 if ($env:INSTALL_NPM_PACKAGES -eq 'on') {
-    Write-Heading "Installing NPM packages..."
-    $npm_args = "install", ($npm_packages -join ' ')
-    Start-Process -FilePath $npm_cmd -ArgumentList $npm_args -NoNewWindow -Wait
+    Write-Heading "Installing Bun packages..."
+    $bun_args = "add", "-g", ($npm_packages -join ' ')
+    & $bun_cmd $bun_args
 }
 
 if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_ps1) -and (Test-Path $pip_exe)) {
     Write-Heading "Installing Python packages (PyTorch)..."
     $pip_args_pytorch = "install", ($pytorch_packages -join ' '), "--index-url", $pytorch_index_url
-    Start-Process -FilePath $pip_exe -ArgumentList $pip_args_pytorch -NoNewWindow -Wait
+    & $pip_exe $pip_args_pytorch
 
     Write-Heading "Installing Python packages (from Git)..."
     $pip_args_git = "install", ($python_git_packages -join ' ')
-    Start-Process -FilePath $pip_exe -ArgumentList $pip_args_git -NoNewWindow -Wait
+    & $pip_exe $pip_args_git
 }
 
 Write-Heading "Exporting configuration to PowerShell profile..."
