@@ -114,6 +114,5 @@ $robocopy_args = @(
     "/mt:$([Environment]::ProcessorCount)",
     "/nc", "/ndl", "/nfl", "/np", "/ns", "/xj"
 )
-Start-Process -FilePath "robocopy.exe" -ArgumentList $robocopy_args -NoNewWindow -Wait
-
-Write-Heading "Completed."
+& "robocopy.exe" ($robocopy_args -join ' '); Write-Heading "Completed."
+# robocopy exits with code 16. adding a command at the end of ^ this line continues the workflow job.
