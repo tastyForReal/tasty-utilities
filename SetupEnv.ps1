@@ -20,6 +20,10 @@ $python_git_packages = @(
     "git+https://github.com/Yujia-Yan/Transkun"
 )
 
+$npm_packages = @(
+    "@google/gemini-cli"
+)
+
 $oh_my_posh_theme_url = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
 
 $manage_junctions_script = ".\ManageJunctions.ps1"
@@ -38,8 +42,9 @@ function Write-Heading {
 $local_username = $env:LOCAL_USERNAME, $default_username | Where-Object { -not [string]::IsNullOrEmpty($_) } | Select-Object -First 1
 $local_userprofile = Join-Path "C:\Users" $local_username
 $scoop_dir = Join-Path $local_userprofile "scoop"
-$scoop_exe = Join-Path $scoop_dir "shims\scoop.ps1"
+$scoop_ps1 = Join-Path $scoop_dir "shims\scoop.ps1"
 $pip_exe = Join-Path $scoop_dir "apps\python\current\Scripts\pip.exe"
+$npm_cmd = Join-Path $scoop_dir "\apps\nodejs\current\npm.cmd"
 
 Write-Heading "Installing Scoop..."
 
@@ -49,22 +54,28 @@ Invoke-RestMethod -Uri $scoop_installer_url | Out-File -FilePath $scoop_installe
 
 if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
     Write-Heading "Adding additional bucket(s)..."
-    . $scoop_exe bucket add versions
+    . $scoop_ps1 bucket add versions
 
     Write-Heading "Updating Scoop..."
-    . $scoop_exe update
+    . $scoop_ps1 update
 
     Write-Heading "Installing Scoop packages..."
-    . $scoop_exe install $scoop_packages
+    . $scoop_ps1 install $scoop_packages
 
     Write-Heading "Cleaning up old package versions..."
-    . $scoop_exe cleanup *
+    . $scoop_ps1 cleanup *
 
     Write-Heading "Purging package cache..."
-    . $scoop_exe cache rm *
+    . $scoop_ps1 cache rm *
 }
 
-if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_exe) -and (Test-Path $pip_exe)) {
+if ($env:INSTALL_NPM_PACKAGES -eq 'on') {
+    Write-Heading "Installing NPM packages..."
+    $npm_args = "install", ($npm_packages -join ' ')
+    Start-Process -FilePath $npm_cmd -ArgumentList $npm_args -NoNewWindow -Wait
+}
+
+if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_ps1) -and (Test-Path $pip_exe)) {
     Write-Heading "Installing Python packages (PyTorch)..."
     $pip_args_pytorch = "install", ($pytorch_packages -join ' '), "--index-url", $pytorch_index_url
     Start-Process -FilePath $pip_exe -ArgumentList $pip_args_pytorch -NoNewWindow -Wait
