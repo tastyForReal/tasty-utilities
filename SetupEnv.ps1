@@ -5,8 +5,9 @@ $archive_dir = ".\env"
 $scoop_installer_url = "https://get.scoop.sh"
 $scoop_installer_script = ".\InstallScoop.ps1"
 $scoop_packages = @(
-    "7zip", "adb", "bun", "cloc", "dotnet-sdk", "fastfetch", "ffmpeg",
-    "gh", "git", "jq", "nodejs", "oh-my-posh", "python@3.13.9", "wget"
+    "7zip", "adb", "bun", "cloc", "dotnet-sdk", "dotnet-sdk-preview",
+    "fastfetch", "ffmpeg", "gh", "git", "jq", "nodejs", "oh-my-posh",
+    "python@3.13.9", "wget"
 )
 
 $pytorch_index_url = "https://download.pytorch.org/whl/cu130"
@@ -47,6 +48,9 @@ Invoke-RestMethod -Uri $scoop_installer_url | Out-File -FilePath $scoop_installe
 . $scoop_installer_script -ScoopDir $scoop_dir
 
 if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
+    Write-Heading "Adding additional bucket(s)..."
+    . $scoop_exe bucket add versions
+
     Write-Heading "Updating Scoop..."
     . $scoop_exe update
 
