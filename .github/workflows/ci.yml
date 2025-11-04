@@ -4,6 +4,7 @@ name: ci
 env:
     INSTALL_SCOOP_PACKAGES: 'on'
     INSTALL_PYTHON_PACKAGES: 'on'
+    INSTALL_NPM_PACKAGES: 'on'
 
 permissions:
     contents: read
