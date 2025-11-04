@@ -19,7 +19,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v5
             - name: Setup environment
-              run: . .\setup_env.ps1
+              run: . .\SetupEnv.ps1
             - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:

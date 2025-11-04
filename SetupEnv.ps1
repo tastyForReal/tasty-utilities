@@ -3,7 +3,7 @@ $powershell_profile_filename = "Microsoft.PowerShell_profile.ps1"
 $archive_dir = ".\env"
 
 $scoop_installer_url = "https://get.scoop.sh"
-$scoop_installer_script = ".\install_scoop.ps1"
+$scoop_installer_script = ".\InstallScoop.ps1"
 $scoop_packages = @(
     "7zip", "adb", "bun", "cloc", "dotnet-sdk", "fastfetch", "ffmpeg",
     "gh", "git", "jq", "nodejs", "oh-my-posh", "python@3.13.9", "wget"
@@ -21,8 +21,8 @@ $python_git_packages = @(
 
 $oh_my_posh_theme_url = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
 
-$manage_junctions_script = ".\manage_junctions.ps1"
-$recreate_junctions_script = ".\recreate_junctions.ps1"
+$manage_junctions_script = ".\ManageJunctions.ps1"
+$recreate_junctions_script = ".\RecreateJunctions.ps1"
 
 function Write-Heading {
     param(

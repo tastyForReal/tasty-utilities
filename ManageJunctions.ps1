@@ -4,7 +4,7 @@ param(
     [string]$Path
 )
 
-$output_script_path = ".\recreate_junctions.ps1"
+$output_script_path = ".\RecreateJunctions.ps1"
 
 Write-Host "Starting junction management process..."
 
