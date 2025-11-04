@@ -44,7 +44,7 @@ $local_userprofile = Join-Path "C:\Users" $local_username
 $scoop_dir = Join-Path $local_userprofile "scoop"
 $scoop_ps1 = Join-Path $scoop_dir "shims\scoop.ps1"
 $pip_exe = Join-Path $scoop_dir "apps\python\current\Scripts\pip.exe"
-$npm_cmd = Join-Path $scoop_dir "\apps\nodejs\current\npm.cmd"
+$npm_cmd = Join-Path $scoop_dir "apps\nodejs\current\npm.cmd"
 
 Write-Heading "Installing Scoop..."
 
