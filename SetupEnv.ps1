@@ -63,26 +63,23 @@ if ($env:INSTALL_SCOOP_PACKAGES -eq 'on') {
     Write-Heading "Installing Scoop packages..."
     . $scoop_ps1 install $scoop_packages
 
-    Write-Heading "Cleaning up old package versions..."
-    . $scoop_ps1 cleanup *
-
     Write-Heading "Purging package cache..."
     . $scoop_ps1 cache rm *
 }
 
 if ($env:INSTALL_NPM_PACKAGES -eq 'on') {
     Write-Heading "Installing Bun packages..."
-    $bun_args = "add", "-g", ($npm_packages -join ' ')
+    $bun_args = "add", "-g", $npm_packages
     & $bun_cmd $bun_args
 }
 
 if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_ps1) -and (Test-Path $pip_exe)) {
     Write-Heading "Installing Python packages (PyTorch)..."
-    $pip_args_pytorch = "install", ($pytorch_packages -join ' '), "--index-url", $pytorch_index_url
+    $pip_args_pytorch = "install", $pytorch_packages, "--index-url", $pytorch_index_url
     & $pip_exe $pip_args_pytorch
 
     Write-Heading "Installing Python packages (from Git)..."
-    $pip_args_git = "install", ($python_git_packages -join ' ')
+    $pip_args_git = "install", $pytorch_packages
     & $pip_exe $pip_args_git
 }
 
