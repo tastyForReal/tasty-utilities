@@ -12,7 +12,7 @@ $scoop_packages = @(
 
 $pytorch_index_url = "https://download.pytorch.org/whl/cu130"
 $pytorch_packages = @("torch", "torchvision")
-$python_git_packages = @(
+$python_packages = @(
     "git+https://github.com/giampaolo/psutil",
     "git+https://github.com/googleapis/python-genai",
     "git+https://github.com/spotDL/spotify-downloader",
@@ -44,7 +44,6 @@ $local_userprofile = Join-Path "C:\Users" $local_username
 $scoop_dir = Join-Path $local_userprofile "scoop"
 $scoop_ps1 = Join-Path $scoop_dir "shims\scoop.ps1"
 $pip_exe = Join-Path $scoop_dir "apps\python\current\Scripts\pip.exe"
-$npm_cmd = Join-Path $scoop_dir "apps\nodejs\current\npm.cmd"
 $bun_cmd = Join-Path $scoop_dir "apps\bun\current\bun.exe"
 
 Write-Heading "Installing Scoop..."
@@ -79,8 +78,8 @@ if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_ps1) -and (Te
     & $pip_exe $pip_args_pytorch
 
     Write-Heading "Installing Python packages (from Git)..."
-    $pip_args_git = "install", $pytorch_packages
-    & $pip_exe $pip_args_git
+    $pip_args = "install", $python_packages
+    & $pip_exe $pip_args
 }
 
 Write-Heading "Exporting configuration to PowerShell profile..."
