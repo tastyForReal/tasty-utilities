@@ -111,5 +111,5 @@ $robocopy_args = @(
     "/mt:$([Environment]::ProcessorCount)",
     "/nc", "/ndl", "/nfl", "/np", "/ns", "/xj"
 )
-& "robocopy.exe" ($robocopy_args -join ' '); Write-Heading "Completed."
-# robocopy exits with code 16. adding a command at the end of ^ this line continues the workflow job.
+# Use Invoke-Command to prevent non-zero exit codes, continuing the workflow job.
+Invoke-Command { & "robocopy.exe" ($args -join ' ') } -ArgumentList $robocopy_args
