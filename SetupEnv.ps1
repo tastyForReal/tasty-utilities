@@ -110,5 +110,5 @@ $robocopy_args = @(
     "/mt:$([Environment]::ProcessorCount)",
     "/nc", "/ndl", "/nfl", "/np", "/ns", "/xj"
 )
-# Use Invoke-Command to prevent non-zero exit codes, continuing the workflow job.
-Invoke-Command { & "robocopy.exe" ($args -join ' ') } -ArgumentList $robocopy_args
+# Use Invoke-Command to launch robocopy, preventing non-zero exit codes and continuing the workflow job.
+Invoke-Command { & "robocopy.exe" @args } -ArgumentList $robocopy_args
