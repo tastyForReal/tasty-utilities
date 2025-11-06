@@ -4,25 +4,21 @@ $archive_dir = ".\env"
 
 $scoop_installer_url = "https://get.scoop.sh"
 $scoop_installer_script = ".\InstallScoop.ps1"
-$scoop_packages = @(
-    "7zip", "adb", "bun", "cloc", "dotnet-sdk", "dotnet-sdk-preview",
-    "fastfetch", "ffmpeg", "gh", "git", "jq", "nodejs", "oh-my-posh",
+$scoop_packages = `
+    "7zip", "adb", "bun", "cloc", "dotnet-sdk", "dotnet-sdk-preview", `
+    "fastfetch", "ffmpeg", "gh", "git", "jq", "nodejs", "oh-my-posh", `
     "python@3.13.9", "wget"
-)
 
 $pytorch_index_url = "https://download.pytorch.org/whl/cu130"
-$pytorch_packages = @("torch", "torchvision")
-$python_packages = @(
-    "git+https://github.com/giampaolo/psutil",
-    "git+https://github.com/googleapis/python-genai",
-    "git+https://github.com/spotDL/spotify-downloader",
-    "git+https://github.com/yt-dlp/yt-dlp",
+$pytorch_packages = "torch", "torchvision"
+$python_packages = `
+    "git+https://github.com/giampaolo/psutil", `
+    "git+https://github.com/googleapis/python-genai", `
+    "git+https://github.com/spotDL/spotify-downloader", `
+    "git+https://github.com/yt-dlp/yt-dlp", `
     "git+https://github.com/Yujia-Yan/Transkun"
-)
 
-$npm_packages = @(
-    "@google/gemini-cli"
-)
+$npm_packages = "@google/gemini-cli"
 
 $oh_my_posh_theme_url = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
 
@@ -73,11 +69,11 @@ if ($env:INSTALL_NPM_PACKAGES -eq 'on') {
 }
 
 if (($env:INSTALL_PYTHON_PACKAGES -eq 'on') -and (Test-Path $scoop_ps1) -and (Test-Path $pip_exe)) {
-    Write-Heading "Installing Python packages (PyTorch)..."
-    $pip_args_pytorch = "install", $pytorch_packages, "--index-url", $pytorch_index_url
-    & $pip_exe $pip_args_pytorch
+    Write-Heading "Installing Python packages (stage 1 of 2)..."
+    $pip_args = "install", $pytorch_packages, "--index-url", $pytorch_index_url
+    & $pip_exe $pip_args
 
-    Write-Heading "Installing Python packages (from Git)..."
+    Write-Heading "Installing Python packages (stage 2 of 2)..."
     $pip_args = "install", $python_packages
     & $pip_exe $pip_args
 }
@@ -110,5 +106,4 @@ $robocopy_args = @(
     "/mt:$([Environment]::ProcessorCount)",
     "/nc", "/ndl", "/nfl", "/np", "/ns", "/xj"
 )
-# Use Invoke-Command to launch robocopy, preventing non-zero exit codes and continuing the workflow job.
-Invoke-Command { & "robocopy.exe" @args } -ArgumentList $robocopy_args
+Invoke-Command { & "robocopy.exe" $args } -ArgumentList $robocopy_args
