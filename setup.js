@@ -256,12 +256,7 @@ async function main() {
 
   // --- Get updated PATH after setting up Scoop ---
   write_heading("Retrieving updated PATH environment variable...");
-  const get_path_command = list2cmdline([
-    "node",
-    "-e",
-    '"console.log(process.env.Path)"',
-  ]);
-  const updated_path = execSync(get_path_command, {
+  const updated_path = execSync('node -e "console.log(process.env.Path)"', {
     encoding: "utf8",
   }).trim();
 
