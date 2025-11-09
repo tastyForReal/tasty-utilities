@@ -98,7 +98,7 @@ async function main() {
   });
 
   run_command(
-    `powershell.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -File ".\\${SCOOP_INSTALLER_SCRIPT}" -ScoopDir "${scoop_dir}"`
+    `pwsh.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -File ".\\${SCOOP_INSTALLER_SCRIPT}" -ScoopDir "${scoop_dir}"`
   );
 
   // --- Install Scoop Packages (Conditional) ---
@@ -162,7 +162,7 @@ async function main() {
   // --- Manage Junctions ---
   write_heading("Managing junctions...");
   run_command(
-    `powershell.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -File ".\\${MANAGE_JUNCTIONS_SCRIPT}" -Path "${scoop_dir}"`
+    `pwsh.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -File ".\\${MANAGE_JUNCTIONS_SCRIPT}" -Path "${scoop_dir}"`
   );
 
   // --- Archive Contents ---
