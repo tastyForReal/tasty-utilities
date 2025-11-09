@@ -104,16 +104,16 @@ async function main() {
   // --- Install Scoop Packages (Conditional) ---
   if (process.env.INSTALL_SCOOP_PACKAGES === "on") {
     write_heading("Adding additional bucket(s)...");
-    run_command(`& "${scoop_ps1}" bucket add versions`);
+    run_command(`pwsh.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -Command "& '${scoop_ps1}' bucket add versions"`);
 
     write_heading("Updating Scoop...");
-    run_command(`& "${scoop_ps1}" update`);
+    run_command(`pwsh.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -Command "& '${scoop_ps1}' update"`);
 
     write_heading("Installing Scoop packages...");
-    run_command(`& "${scoop_ps1}" install ${SCOOP_PACKAGES.join(" ")}`);
+    run_command(`pwsh.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -Command "& '${scoop_ps1}' install ${SCOOP_PACKAGES.join(" ")}"`);
 
     write_heading("Purging package cache...");
-    run_command(`& "${scoop_ps1}" cache rm *`);
+    run_command(`pwsh.exe -ExecutionPolicy Bypass -NoProfile -NoLogo -Command "& '${scoop_ps1}' cache rm *"`);
   }
 
   // --- Install NPM Packages (Conditional) ---
