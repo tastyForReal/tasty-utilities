@@ -1,4 +1,3 @@
-// Import required Node.js modules
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
@@ -7,7 +6,7 @@ const { execSync } = require("node:child_process");
 // --- Configuration Constants ---
 
 const DEFAULT_USERNAME = "DailyDriver";
-const POWERSHELL_PROFILE_FILENAME = "Microsoft.PowerShell_profile.ps1";
+const POWERSHELL_PROFILE = "Microsoft.PowerShell_profile.ps1";
 const ARCHIVE_DIR = path.join(".", "env");
 
 const SCOOP_INSTALLER_URL = "https://get.scoop.sh";
@@ -40,7 +39,7 @@ const PYTHON_PACKAGES = [
   "git+https://github.com/Yujia-Yan/Transkun",
 ];
 
-const NPM_PACKAGES = "@google/gemini-cli";
+const NPM_PACKAGES = ["@google/gemini-cli"];
 
 const OH_MY_POSH_THEME_URL =
   "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json";
@@ -49,11 +48,13 @@ const MANAGE_JUNCTIONS_SCRIPT = path.join(".", "ManageJunctions.ps1");
 const RECREATE_JUNCTIONS_SCRIPT = path.join(".", "RecreateJunctions.ps1");
 
 /**
- * Convert an array of arguments into a Windows command-line string
- * following MS C runtime parsing rules.
+ * Converts an array of command-line arguments into a single string,
+ * properly escaped according to MS C runtime parsing rules for Windows.
+ * This ensures that arguments with spaces or special characters are
+ * correctly interpreted when passed to a child process.
  *
- * @param {string[]} args - Array of argument strings
- * @returns {string} - Properly escaped command line string
+ * @param {string[]} args - An array of strings, where each string is a command-line argument.
+ * @returns {string} - A single, properly escaped command-line string suitable for execution on Windows.
  */
 function list2cmdline(args) {
   const result = [];
@@ -106,8 +107,10 @@ function list2cmdline(args) {
 }
 
 /**
- * Writes a formatted heading to the console.
- * @param {string} content The text content of the heading.
+ * Prints a formatted heading to the console, typically used to demarcate different
+ * stages or sections of the script's execution for better readability.
+ * The heading includes a top and bottom border made of hyphens.
+ * @param {string} content The text content to be displayed as the heading.
  */
 function write_heading(content) {
   const border = "-".repeat(content.length);
@@ -117,15 +120,21 @@ function write_heading(content) {
 }
 
 /**
- * Executes a command synchronously and prints its output to the console.
- * @param {string} command The command to execute.
+ * Executes a given command synchronously in the shell and pipes its standard output
+ * and standard error to the console. It uses `list2cmdline` to properly escape
+ * the command arguments for Windows execution.
+ * Special handling is included for `robocopy.exe` to prevent script termination
+ * on expected non-zero exit codes (which robocopy often returns even on success).
+ * @param {string[]} args An array where the first element is the command and subsequent elements are its arguments.
+ * @throws {Error} Throws an error if the command execution fails, unless it's `robocopy.exe`.
  */
-function run_command(command) {
+function run_command(args) {
+  const command = list2cmdline(args);
   console.log(`> Executing: ${command}`);
   try {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
-    if (command.startsWith("robocopy.exe")) {
+    if (args[0] === "robocopy.exe") {
       return;
     }
     throw error;
@@ -133,9 +142,7 @@ function run_command(command) {
 }
 
 // --- Main Script Logic ---
-
 async function main() {
-  // Determine user profile path
   const local_username = process.env.LOCAL_USERNAME || DEFAULT_USERNAME;
   const local_userprofile = path.join("C:\\Users", local_username);
   const scoop_dir = path.join(local_userprofile, "scoop");
@@ -161,82 +168,73 @@ async function main() {
     encoding: "utf8",
   });
 
-  run_command(
-    list2cmdline([
+  run_command([
+    "pwsh.exe",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-NoProfile",
+    "-NoLogo",
+    "-File",
+    SCOOP_INSTALLER_SCRIPT,
+    "-ScoopDir",
+    scoop_dir,
+  ]);
+
+  // --- Install Scoop Packages ---
+  if (process.env.INSTALL_SCOOP_PACKAGES === "on") {
+    write_heading("Adding additional bucket(s)...");
+    run_command([
       "pwsh.exe",
       "-ExecutionPolicy",
       "Bypass",
       "-NoProfile",
       "-NoLogo",
-      "-File",
-      SCOOP_INSTALLER_SCRIPT,
-      "-ScoopDir",
-      scoop_dir,
-    ])
-  );
-
-  // --- Install Scoop Packages (Conditional) ---
-  if (process.env.INSTALL_SCOOP_PACKAGES === "on") {
-    write_heading("Adding additional bucket(s)...");
-    run_command(
-      list2cmdline([
-        "pwsh.exe",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-NoProfile",
-        "-NoLogo",
-        "-Command",
-        `& ${scoop_ps1} bucket add versions`,
-      ])
-    );
+      "-Command",
+      `& ${scoop_ps1} bucket add versions`,
+    ]);
 
     write_heading("Updating Scoop...");
-    run_command(
-      list2cmdline([
-        "pwsh.exe",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-NoProfile",
-        "-NoLogo",
-        "-Command",
-        `& ${scoop_ps1} update`,
-      ])
-    );
+    run_command([
+      "pwsh.exe",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-NoProfile",
+      "-NoLogo",
+      "-Command",
+      `& ${scoop_ps1} update`,
+    ]);
 
     write_heading("Installing Scoop packages...");
-    run_command(
-      list2cmdline([
-        "pwsh.exe",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-NoProfile",
-        "-NoLogo",
-        "-Command",
-        `& ${scoop_ps1} install ${list2cmdline(SCOOP_PACKAGES)}`,
-      ])
-    );
+    run_command([
+      "pwsh.exe",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-NoProfile",
+      "-NoLogo",
+      "-Command",
+      `& ${scoop_ps1} install`,
+      ...SCOOP_PACKAGES,
+    ]);
 
     write_heading("Purging package cache...");
-    run_command(
-      list2cmdline([
-        "pwsh.exe",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-NoProfile",
-        "-NoLogo",
-        "-Command",
-        `& ${scoop_ps1} cache rm *`,
-      ])
-    );
+    run_command([
+      "pwsh.exe",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-NoProfile",
+      "-NoLogo",
+      "-Command",
+      `& ${scoop_ps1} cache rm *`,
+    ]);
   }
 
-  // --- Install NPM Packages (Conditional) ---
+  // --- Install NPM Packages ---
   if (process.env.INSTALL_NPM_PACKAGES === "on") {
     write_heading("Installing Bun packages...");
-    run_command(list2cmdline([bun_cmd, "add", "-g", NPM_PACKAGES]));
+    run_command([bun_cmd, "add", "-g", ...NPM_PACKAGES]);
   }
 
-  // --- Install Python Packages (Conditional) ---
+  // --- Install Python Packages ---
   if (
     process.env.INSTALL_PYTHON_PACKAGES === "on" &&
     fs.existsSync(scoop_ps1) &&
@@ -249,35 +247,27 @@ async function main() {
       "--index-url",
       PYTORCH_INDEX_URL,
     ];
-    run_command(list2cmdline([pip_exe, ...pytorch_args]));
+    run_command([pip_exe, ...pytorch_args]);
 
     write_heading("Installing Python packages (stage 2 of 2)...");
     const python_args = ["install", ...PYTHON_PACKAGES];
-    run_command(list2cmdline([pip_exe, ...python_args]));
+    run_command([pip_exe, ...python_args]);
   }
 
-  // --- Workaround: Get updated PATH from PowerShell session after Scoop installations ---
-  write_heading(
-    "Retrieving updated PATH environment variable from PowerShell session..."
-  );
+  // --- Get updated PATH after setting up Scoop ---
+  write_heading("Retrieving updated PATH environment variable...");
   const get_path_command = list2cmdline([
-    "pwsh.exe",
-    "-ExecutionPolicy",
-    "Bypass",
-    "-NoProfile",
-    "-NoLogo",
-    "-Command",
-    '"$env:Path"',
+    "node",
+    "-e",
+    '"console.log(process.env.Path)"',
   ]);
-  const updated_path_from_powershell = execSync(get_path_command, {
+  const updated_path = execSync(get_path_command, {
     encoding: "utf8",
-  })
-    .toString()
-    .trim();
+  }).trim();
 
   // --- Export PowerShell Profile Configuration ---
   write_heading("Exporting configuration to PowerShell profile...");
-  const path_env = updated_path_from_powershell || ""; // Use the updated PATH
+  const path_env = updated_path || "";
   const scoop_paths = path_env
     .split(";")
     .filter((p) => p.toLowerCase().includes("scoop"));
@@ -287,33 +277,31 @@ async function main() {
     `oh-my-posh init pwsh --config "${OH_MY_POSH_THEME_URL}" | Invoke-Expression`,
   ].join("\n");
 
-  fs.writeFileSync(POWERSHELL_PROFILE_FILENAME, profile_content, {
+  fs.writeFileSync(POWERSHELL_PROFILE, profile_content, {
     encoding: "utf8",
   });
-  console.log(fs.readFileSync(POWERSHELL_PROFILE_FILENAME, "utf8"));
+  console.log(fs.readFileSync(POWERSHELL_PROFILE, "utf8"));
 
   // --- Manage Junctions ---
   write_heading("Managing junctions...");
-  run_command(
-    list2cmdline([
-      "pwsh.exe",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-NoProfile",
-      "-NoLogo",
-      "-File",
-      MANAGE_JUNCTIONS_SCRIPT,
-      "-Path",
-      scoop_dir,
-    ])
-  );
+  run_command([
+    "pwsh.exe",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-NoProfile",
+    "-NoLogo",
+    "-File",
+    MANAGE_JUNCTIONS_SCRIPT,
+    "-Path",
+    scoop_dir,
+  ]);
 
   // --- Archive Contents ---
   write_heading("Copying contents for archiving...");
   fs.mkdirSync(ARCHIVE_DIR, { recursive: true });
   fs.copyFileSync(
-    POWERSHELL_PROFILE_FILENAME,
-    path.join(ARCHIVE_DIR, POWERSHELL_PROFILE_FILENAME)
+    POWERSHELL_PROFILE,
+    path.join(ARCHIVE_DIR, POWERSHELL_PROFILE)
   );
 
   if (fs.existsSync(RECREATE_JUNCTIONS_SCRIPT)) {
@@ -335,10 +323,9 @@ async function main() {
     "/ns",
     "/xj",
   ];
-  run_command(list2cmdline(["robocopy.exe", ...robocopy_args]));
+  run_command(["robocopy.exe", ...robocopy_args]);
 }
 
-// Run the main function and handle potential errors
 main().catch((error) => {
   console.error("\n--- SCRIPT FAILED ---");
   console.error(error.message);
