@@ -1,0 +1,32 @@
+name: Build Windows Environment
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-archive:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'latest'
+
+      - name: Run setup script
+        run: node setup.js
+        env:
+          INSTALL_SCOOP_PACKAGES: 'on'
+          INSTALL_NPM_PACKAGES: 'on'
+          INSTALL_PYTHON_PACKAGES: 'on'
+          LOCAL_USERNAME: 'DailyDriver'
+
+      - name: Upload environment artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: env-${{ github.run_id }}
+          path: ./env
