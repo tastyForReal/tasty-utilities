@@ -46,6 +46,17 @@ const OH_MY_POSH_THEME_URL =
 
 const MANAGE_JUNCTIONS_SCRIPT = path.join(".", "ManageJunctions.ps1");
 const RECREATE_JUNCTIONS_SCRIPT = path.join(".", "RecreateJunctions.ps1");
+const EXPORT_ENVIRONMENT_SCRIPT = path.join(".", "ExportEnvironment.ps1");
+
+const PWSH_EXEC_ARGS = [
+  "pwsh.exe",
+  "-ExecutionPolicy",
+  "Bypass",
+  "-NoProfile",
+  "-NoLogo",
+];
+const PWSH_FILE_ARGS = [...PWSH_EXEC_ARGS, "-File"];
+const PWSH_COMMAND_ARGS = [...PWSH_EXEC_ARGS, "-Command"];
 
 /**
  * Converts an array of command-line arguments into a single string,
@@ -57,60 +68,60 @@ const RECREATE_JUNCTIONS_SCRIPT = path.join(".", "RecreateJunctions.ps1");
  * @returns {string} - A single, properly escaped command-line string suitable for execution on Windows.
  */
 function list2cmdline(args) {
-  const result = [];
+  const cmdline = [];
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    let bs_buf = [];
-    let need_quote = arg === "" || /\s/.test(arg);
+    let backslashes = [];
+    let needs_quotes = arg === "" || /\s/.test(arg);
 
     if (i > 0) {
-      result.push(" ");
+      cmdline.push(" ");
     }
 
-    if (need_quote) {
-      result.push('"');
+    if (needs_quotes) {
+      cmdline.push('"');
     }
 
     for (let j = 0; j < arg.length; j++) {
-      const c = arg[j];
+      const char = arg[j];
 
-      if (c === "\\") {
-        bs_buf.push(c);
-      } else if (c === '"') {
-        result.push("\\".repeat(bs_buf.length * 2));
-        bs_buf = [];
-        result.push('\\"');
+      if (char === "\\") {
+        backslashes.push(char);
+      } else if (char === '"') {
+        cmdline.push("\\".repeat(backslashes.length * 2));
+        backslashes = [];
+        cmdline.push('\\"');
       } else {
-        if (bs_buf.length > 0) {
-          result.push(...bs_buf);
-          bs_buf = [];
+        if (backslashes.length > 0) {
+          cmdline.push(...backslashes);
+          backslashes = [];
         }
-        result.push(c);
+        cmdline.push(char);
       }
     }
 
-    if (bs_buf.length > 0) {
-      if (need_quote) {
-        result.push("\\".repeat(bs_buf.length * 2));
+    if (backslashes.length > 0) {
+      if (needs_quotes) {
+        cmdline.push("\\".repeat(backslashes.length * 2));
       } else {
-        result.push(...bs_buf);
+        cmdline.push(...backslashes);
       }
     }
 
-    if (need_quote) {
-      result.push('"');
+    if (needs_quotes) {
+      cmdline.push('"');
     }
   }
 
-  return result.join("");
+  return cmdline.join("");
 }
 
 /**
  * Prints a formatted heading to the console, typically used to demarcate different
  * stages or sections of the script's execution for better readability.
  * The heading includes a top and bottom border made of hyphens.
- * @param {string} content The text content to be displayed as the heading.
+ * @param {string} content - The text content to be displayed as the heading.
  */
 function write_heading(content) {
   const border = "-".repeat(content.length);
@@ -123,10 +134,8 @@ function write_heading(content) {
  * Executes a given command synchronously in the shell and pipes its standard output
  * and standard error to the console. It uses `list2cmdline` to properly escape
  * the command arguments for Windows execution.
- * Special handling is included for `robocopy.exe` to prevent script termination
- * on expected non-zero exit codes (which robocopy often returns even on success).
- * @param {string[]} args An array where the first element is the command and subsequent elements are its arguments.
- * @throws {Error} Throws an error if the command execution fails, unless it's `robocopy.exe`.
+ * @param {string[]} args An array where the first element is the commandand subsequent elements are its arguments.
+ * @throws {Error} Throws an error if the command execution fails.
  */
 function run_command(args) {
   const command = list2cmdline(args);
@@ -134,6 +143,8 @@ function run_command(args) {
   try {
     execSync(command, { stdio: "inherit" });
   } catch (error) {
+    // robocopy often returns non-zero exit codes even on success,
+    // so we don't want to terminate the script
     if (args[0] === "robocopy.exe") {
       return;
     }
@@ -169,11 +180,7 @@ async function main() {
   });
 
   run_command([
-    "pwsh.exe",
-    "-ExecutionPolicy",
-    "Bypass",
-    "-NoProfile",
-    "-NoLogo",
+    ...PWSH_FILE_ARGS,
     "-File",
     SCOOP_INSTALLER_SCRIPT,
     "-ScoopDir",
@@ -183,49 +190,20 @@ async function main() {
   // --- Install Scoop Packages ---
   if (process.env.INSTALL_SCOOP_PACKAGES === "on") {
     write_heading("Adding additional bucket(s)...");
-    run_command([
-      "pwsh.exe",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-NoProfile",
-      "-NoLogo",
-      "-Command",
-      `& ${scoop_ps1} bucket add versions`,
-    ]);
+    run_command([...PWSH_COMMAND_ARGS, `& ${scoop_ps1} bucket add versions`]);
 
     write_heading("Updating Scoop...");
-    run_command([
-      "pwsh.exe",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-NoProfile",
-      "-NoLogo",
-      "-Command",
-      `& ${scoop_ps1} update`,
-    ]);
+    run_command([...PWSH_COMMAND_ARGS, `& ${scoop_ps1} update`]);
 
     write_heading("Installing Scoop packages...");
     run_command([
-      "pwsh.exe",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-NoProfile",
-      "-NoLogo",
-      "-Command",
+      ...PWSH_COMMAND_ARGS,
       `& ${scoop_ps1} install`,
       ...SCOOP_PACKAGES,
     ]);
 
     write_heading("Purging package cache...");
-    run_command([
-      "pwsh.exe",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-NoProfile",
-      "-NoLogo",
-      "-Command",
-      `& ${scoop_ps1} cache rm *`,
-    ]);
+    run_command([...PWSH_COMMAND_ARGS, `& ${scoop_ps1} cache rm *`]);
   }
 
   // --- Install NPM Packages ---
@@ -254,42 +232,20 @@ async function main() {
     run_command([pip_exe, ...python_args]);
   }
 
-  // --- Get updated PATH after setting up Scoop ---
-  write_heading("Retrieving updated PATH environment variable...");
-  const updated_path = execSync('node -e "console.log(process.env.Path)"', {
-    encoding: "utf8",
-  }).trim();
-
   // --- Export PowerShell Profile Configuration ---
   write_heading("Exporting configuration to PowerShell profile...");
-  const path_env = updated_path || "";
-  const scoop_paths = path_env
-    .split(";")
-    .filter((p) => p.toLowerCase().includes("scoop"));
-
-  const profile_content = [
-    `$env:Path += ";${scoop_paths.join(";")}"`,
-    `oh-my-posh init pwsh --config "${OH_MY_POSH_THEME_URL}" | Invoke-Expression`,
-  ].join("\n");
-
-  fs.writeFileSync(POWERSHELL_PROFILE, profile_content, {
-    encoding: "utf8",
-  });
-  console.log(fs.readFileSync(POWERSHELL_PROFILE, "utf8"));
+  run_command([
+    ...PWSH_FILE_ARGS,
+    EXPORT_ENVIRONMENT_SCRIPT,
+    "-OhMyPoshThemeUrl",
+    OH_MY_POSH_THEME_URL,
+    "-PowershellProfileName",
+    POWERSHELL_PROFILE,
+  ]);
 
   // --- Manage Junctions ---
   write_heading("Managing junctions...");
-  run_command([
-    "pwsh.exe",
-    "-ExecutionPolicy",
-    "Bypass",
-    "-NoProfile",
-    "-NoLogo",
-    "-File",
-    MANAGE_JUNCTIONS_SCRIPT,
-    "-Path",
-    scoop_dir,
-  ]);
+  run_command([...PWSH_FILE_ARGS, MANAGE_JUNCTIONS_SCRIPT, "-Path", scoop_dir]);
 
   // --- Archive Contents ---
   write_heading("Copying contents for archiving...");
