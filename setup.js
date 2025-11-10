@@ -181,7 +181,6 @@ async function main() {
 
   run_command([
     ...PWSH_FILE_ARGS,
-    "-File",
     SCOOP_INSTALLER_SCRIPT,
     "-ScoopDir",
     scoop_dir,
