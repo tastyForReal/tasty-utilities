@@ -6,11 +6,14 @@ const { execSync } = require("node:child_process");
 // --- Configuration Constants ---
 
 const DEFAULT_USERNAME = "DailyDriver";
-const POWERSHELL_PROFILE = "Microsoft.PowerShell_profile.ps1";
-const ARCHIVE_DIR = path.join(".", "env");
+const POWERSHELL_PROFILE = path.join(
+  __dirname,
+  "Microsoft.PowerShell_profile.ps1"
+);
+const ARCHIVE_DIR = path.join(__dirname, "env");
 
 const SCOOP_INSTALLER_URL = "https://get.scoop.sh";
-const SCOOP_INSTALLER_SCRIPT = path.join(".", "InstallScoop.ps1");
+const SCOOP_INSTALLER_SCRIPT = path.join(__dirname, "InstallScoop.ps1");
 const SCOOP_PACKAGES = [
   "7zip",
   "adb",
@@ -44,9 +47,9 @@ const NPM_PACKAGES = ["@google/gemini-cli"];
 const OH_MY_POSH_THEME_URL =
   "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json";
 
-const MANAGE_JUNCTIONS_SCRIPT = path.join(".", "ManageJunctions.ps1");
-const RECREATE_JUNCTIONS_SCRIPT = path.join(".", "RecreateJunctions.ps1");
-const EXPORT_ENVIRONMENT_SCRIPT = path.join(".", "ExportEnvironment.ps1");
+const MANAGE_JUNCTIONS_SCRIPT = path.join(__dirname, "ManageJunctions.ps1");
+const RECREATE_JUNCTIONS_SCRIPT = path.join(__dirname, "RecreateJunctions.ps1");
+const EXPORT_ENVIRONMENT_SCRIPT = path.join(__dirname, "ExportEnvironment.ps1");
 
 const PWSH_EXEC_ARGS = [
   "pwsh.exe",
@@ -251,13 +254,13 @@ async function main() {
   fs.mkdirSync(ARCHIVE_DIR, { recursive: true });
   fs.copyFileSync(
     POWERSHELL_PROFILE,
-    path.join(ARCHIVE_DIR, POWERSHELL_PROFILE)
+    path.join(ARCHIVE_DIR, path.basename(POWERSHELL_PROFILE))
   );
 
   if (fs.existsSync(RECREATE_JUNCTIONS_SCRIPT)) {
     fs.copyFileSync(
       RECREATE_JUNCTIONS_SCRIPT,
-      path.join(ARCHIVE_DIR, RECREATE_JUNCTIONS_SCRIPT)
+      path.join(ARCHIVE_DIR, path.basename(RECREATE_JUNCTIONS_SCRIPT))
     );
   }
 
