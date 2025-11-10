@@ -25,7 +25,7 @@ $path_env = $updated_path
 $scoop_paths = $path_env.Split(';') | Where-Object { $_ -like "*scoop*" }
 
 $profile_content = @(
-    "`$env:Path += `;$($scoop_paths -join ';')`""
+    "`$env:Path += `";$($scoop_paths -join ';')`""
     "oh-my-posh init pwsh --config `"$OhMyPoshThemeUrl`" | Invoke-Expression"
 ) -join "`n"
 
