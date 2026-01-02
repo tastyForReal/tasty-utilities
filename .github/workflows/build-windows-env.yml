@@ -12,13 +12,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 'latest'
-
       - name: Run setup script
-        run: node setup.js
+        run: pwsh -File SetupEnvironment.ps1
         env:
           INSTALL_SCOOP_PACKAGES: 'on'
           INSTALL_NPM_PACKAGES: 'on'
