@@ -102,7 +102,7 @@ try {
         Invoke-ExternalCommand "scoop" @("update")
 
         Write-Heading "Installing Scoop packages..."
-        Invoke-ExternalCommand "scoop" @("install") + $SCOOP_PACKAGES
+        Invoke-ExternalCommand "scoop" (@("install") + $SCOOP_PACKAGES)
 
         Write-Heading "Purging package cache..."
         Invoke-ExternalCommand "scoop" @("cache", "rm", "*")
