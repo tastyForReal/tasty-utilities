@@ -60,7 +60,7 @@ function Invoke-ExternalCommand {
     Write-Host "> Executing: $CommandPath $argString"
     & $CommandPath @Arguments
     if ($LASTEXITCODE -ne 0) {
-        throw "Command failed with exit code $LASTEXITCODE: $CommandPath $argString"
+        throw "Command failed with exit code ${LASTEXITCODE}: $CommandPath $argString"
     }
 }
 
