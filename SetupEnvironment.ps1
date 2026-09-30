@@ -12,7 +12,6 @@ $SCOOP_PACKAGES = @(
     "bun",
     "cloc",
     "dotnet-sdk",
-    "dotnet-sdk-preview",
     "fastfetch",
     "ffmpeg",
     "gh",
@@ -27,14 +26,10 @@ $PYTORCH_INDEX_URL = "https://download.pytorch.org/whl/cu130"
 $PYTORCH_PACKAGES = @("torch", "torchvision")
 
 $PYTHON_PACKAGES = @(
-    "git+https://github.com/giampaolo/psutil",
-    "git+https://github.com/googleapis/python-genai",
-    "git+https://github.com/spotDL/spotify-downloader",
-    "git+https://github.com/yt-dlp/yt-dlp",
-    "git+https://github.com/Yujia-Yan/Transkun"
+    "git+https://github.com/yt-dlp/yt-dlp"
 )
 
-$NPM_PACKAGES = @("@google/gemini-cli@latest")
+$NPM_PACKAGES = @("@opencode/cli")
 
 $OH_MY_POSH_THEME_URL = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json"
 
